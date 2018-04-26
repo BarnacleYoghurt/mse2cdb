@@ -36,6 +36,5 @@ int main(int argc, char **argv) {
         std::cout << "Oh, but I was totally called for language " << argLanguage << " and template " << argTemplate
                   << "." << std::endl;
     }
-
     return 0;
 }
