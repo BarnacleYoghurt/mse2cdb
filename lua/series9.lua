@@ -12,7 +12,7 @@ function CardData.desc(data)
 end
 function CardData.strList(data)
 	local notes = aux.GetLines(data:GetMultilineValue("notes"))
-	local strs = []
+	local strs = {}
 	local strIndex = 1
 	for note in notes do
 		if note:sub(1,2) == "{{" and note:sub(-2) == "}}" then
@@ -47,7 +47,7 @@ function CardData.type(data)
 		local level = aux.SymEscape(data:GetValue("level"))
 		if level:find("Spell") then
 			result = result + TYPE_SPELL
-		else if level:find("Trap") then
+		elseif level:find("Trap") then
 			result = result + TYPE_TRAP
 		else
 			result = result + TYPE_MONSTER
@@ -61,7 +61,7 @@ function CardData.type(data)
 					hasSubtype = true
 					result = result + subtype[data:GetValue("type"..nextType)]
 				end
-				nextType = nextType++
+				nextType = nextType + 1
 			end
 			if not hasSubtype then
 				result = result + TYPE_NORMAL
