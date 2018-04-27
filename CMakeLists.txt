@@ -7,3 +7,4 @@ find_package(sqlite3 REQUIRED)
 
 set(SOURCE_FILES main.cpp)
 add_executable(mse2cdb ${SOURCE_FILES})
+target_link_libraries(mse2cdb ${SQLITE3_LIBRARIES})

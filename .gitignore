@@ -77,3 +77,7 @@ fabric.properties
 *.exe
 *.out
 *.app
+
+#Test Data
+*.cdb
+*.mse
