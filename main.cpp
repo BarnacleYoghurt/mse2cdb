@@ -1,7 +1,6 @@
 #include <iostream>
 #include <getopt.h>
-#include <string>
-#include <sqlite3.h>
+#include <io/CDBAccess.hpp>
 
 int main(int argc, char **argv) {
     int opt = 0;
@@ -41,24 +40,11 @@ int main(int argc, char **argv) {
         std::cout << "I need an MSE file and a CDB file!" << std::endl;
     }
     else {
-        sqlite3 *cdb;
-        if (sqlite3_open(cdbPath.c_str(), &cdb) != SQLITE_OK){
-            std::cerr << "Could not open cdb file at " << cdbPath << " (" << sqlite3_errmsg(cdb) << ")." << std::endl;
-            return 1;
-        }
-        sqlite3_stmt *prepared;
-        if (sqlite3_prepare_v2(cdb, "SELECT COUNT(*) FROM datas", -1, &prepared, 0) != SQLITE_OK){
-            std::cerr << "Could not prepare statement (" << sqlite3_errmsg(cdb) << ")." << std::endl;
-            return 1;
-        }
-        if (sqlite3_step(prepared) != SQLITE_ROW){
-            std::cerr << "Could not execute prepared statement (" << sqlite3_errmsg(cdb) << ")." << std::endl;
-            return 1;
-        }
-        int count = sqlite3_column_int(prepared, 0);
+        io::CDBAccess cdbAccess(cdbPath);
+        int count = cdbAccess.getCardCount();
 
         std::cout << "Oh, but I was totally called for language " << argLanguage << " and template " << argTemplate
-                  << "to import " << msePath << " into " << cdbPath << ", which currently contains " << count << " cards." << std::endl;
+                  << " to import " << msePath << " into " << cdbPath << ", which currently contains " << count << " cards." << std::endl;
     }
     
     return 0;
