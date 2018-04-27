@@ -1,13 +1,15 @@
 #include <iostream>
 #include <getopt.h>
 #include <string>
+#include <sqlite3.h>
 
 int main(int argc, char **argv) {
-
     int opt = 0;
     int indexptr = 0;
-    std::string argLanguage;
-    std::string argTemplate;
+    std::string argLanguage = "en";
+    std::string argTemplate = "series9";
+    std::string msePath;
+    std::string cdbPath;
 
     struct option longopts[] = {
             {"language", required_argument, 0, 'l'},
@@ -27,14 +29,20 @@ int main(int argc, char **argv) {
                 return 1;
         }
     }
+    if (optind < argc){
+        msePath = argv[optind++];
+    }
+    if (optind < argc){
+        cdbPath = argv[optind++];
+    }
 
     std::cout << "Hello, I'm a lua-configurable MSE->CDB import tool! I haven't been programmed yet, so I'm just outputting this pointless message." << std::endl;
-    if (argLanguage.empty() || argTemplate.empty()){
-        std::cout << "FEED ME ARGUMENTS (--language and --template/-l and -t)!" << std::endl;
+    if (msePath.empty() || cdbPath.empty()){
+        std::cout << "I need an MSE file and a CDB file!" << std::endl;
     }
     else {
         std::cout << "Oh, but I was totally called for language " << argLanguage << " and template " << argTemplate
-                  << "." << std::endl;
+                  << "to import " << msePath << " into " << cdbPath << "." << std::endl;
     }
     
     return 0;
