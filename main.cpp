@@ -41,8 +41,14 @@ int main(int argc, char **argv) {
     }
     else {
         io::CDBAccess cdbAccess(cdbPath);
-        int count = cdbAccess.getCardCount();
-
+        int count =  0;
+        try {
+            count = cdbAccess.getCardCount();
+        }
+        catch (const std::runtime_error& e){
+            std::cout << "Oh wow, you managed to make the test call throw an exception. I hope you're proud of yourself." << std::endl;
+            std::cerr << e.what() << std::endl;
+        }
         std::cout << "Oh, but I was totally called for language " << argLanguage << " and template " << argTemplate
                   << " to import " << msePath << " into " << cdbPath << ", which currently contains " << count << " cards." << std::endl;
     }
