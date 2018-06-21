@@ -1,6 +1,8 @@
 #include <iostream>
 #include <getopt.h>
-#include <io/CDBAccess.hpp>
+#include <fstream>
+#include "io/CDBAccess.hpp"
+#include "domain/MSEDataNode.hpp"
 
 int main(int argc, char **argv) {
     int opt = 0;
@@ -40,6 +42,30 @@ int main(int argc, char **argv) {
         std::cout << "I need an MSE file and a CDB file!" << std::endl;
     }
     else {
+        //Generate MSE tree
+        std::string mseLine;
+        std::ifstream mseStream(argTemplate);
+
+        domain::MSEDataNode root;
+        domain::MSEDataNode& parent = root;
+
+        while (getline(mseStream, mseLine)){
+            std::string key;
+            std::string value;
+            size_t sepPos = mseLine.find(':');
+            if (sepPos != std::string::npos){
+                key = mseLine.substr(0,sepPos);
+                value = mseLine.substr(sepPos + 1);
+            }
+            else{
+                value = mseLine;
+            }
+
+            domain::MSEDataNode mseNode(parent);
+            //TODO: Set Value in mseNode
+            //TODO: Add mseNode as child of its parent (actually could do this in constructor)
+        }
+
         io::CDBAccess cdbAccess(cdbPath);
         int count =  0;
         try {
