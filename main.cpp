@@ -5,6 +5,12 @@
 #include "io/CDBAccess.hpp"
 #include "domain/MSEDataNode.hpp"
 
+extern "C"{
+    #include "lua5.1/lua.h"
+    #include "lua5.1/lauxlib.h"
+    #include "lua5.1/lualib.h"
+}
+
 int main(int argc, char **argv) {
     int opt = 0;
     int indexptr = 0;
@@ -92,6 +98,17 @@ int main(int argc, char **argv) {
             parents[childIndent]->addChild(key, mseNode);
             parents[childIndent+1] = mseNode;
         }
+
+        //Call lua script
+        lua_State *L;
+        L = luaL_newstate();
+        luaL_loadfile(L, ("../lua/" + argTemplate + ".lua").c_str());
+        //lua_getglobal(L, "cd");
+        //lua_getfield(L, -1, "helloWorld");
+        lua_getglobal(L, "helloWorld");
+        lua_call(L,0,1);
+        std::cout << lua_tostring(L, -1) << std::endl;
+
 
         io::CDBAccess cdbAccess(cdbPath);
         int count =  0;

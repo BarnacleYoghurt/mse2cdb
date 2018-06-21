@@ -1,6 +1,10 @@
 CardData={}
 cd=CardData
 
+function helloWorld()
+	return "Hello world";
+end
+
 function CardData.gamecode(data)
 	return data:GetValue("gamecode")
 end
