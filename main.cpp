@@ -48,8 +48,33 @@ int main(int argc, char **argv) {
 
         domain::MSEDataNode root;
         domain::MSEDataNode& parent = root;
+        domain::MSEDataNode& previousNode = root;
+        int childIndent = 0;
 
         while (getline(mseStream, mseLine)){
+            int currentIndent = 0;
+            for (char c : mseLine){
+                if (c == '\t'){
+                    currentIndent++;
+                }
+                else{
+                    break;
+                }
+            }
+            if (currentIndent > childIndent){
+                childIndent = currentIndent;
+                parent = previousNode;
+            }
+            else if (currentIndent < childIndent){
+                childIndent = currentIndent;
+                if (parent.getParent() == nullptr){
+                    parent = root;
+                }
+                else {
+                    parent = *parent.getParent();
+                }
+            }
+
             std::string key;
             std::string value;
             size_t sepPos = mseLine.find(':');
@@ -61,9 +86,10 @@ int main(int argc, char **argv) {
                 value = mseLine;
             }
 
-            domain::MSEDataNode mseNode(parent);
-            //TODO: Set Value in mseNode
-            //TODO: Add mseNode as child of its parent (actually could do this in constructor)
+            domain::MSEDataNode mseNode(std::make_shared(parent));
+            mseNode.setValue(value);
+            parent.addChild(key, mseNode);
+            previousNode = mseNode;
         }
 
         io::CDBAccess cdbAccess(cdbPath);
