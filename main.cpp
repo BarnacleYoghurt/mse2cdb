@@ -1,6 +1,7 @@
 #include <iostream>
 #include <getopt.h>
 #include <fstream>
+#include <algorithm>
 #include "io/CDBAccess.hpp"
 #include "domain/MSEDataNode.hpp"
 
@@ -44,11 +45,13 @@ int main(int argc, char **argv) {
     else {
         //Generate MSE tree
         std::string mseLine;
-        std::ifstream mseStream(argTemplate);
+        //TODO: Open the contained set file when given a .mse file
+        std::ifstream mseStream(msePath);
 
-        domain::MSEDataNode root;
-        domain::MSEDataNode& parent = root;
-        domain::MSEDataNode& previousNode = root;
+        std::shared_ptr<domain::MSEDataNode> root = std::make_shared<domain::MSEDataNode>();
+        std::shared_ptr<domain::MSEDataNode> currentParent;
+        std::map<int, std::shared_ptr<domain::MSEDataNode>> parents;
+        parents[0] = root;
         int childIndent = 0;
 
         while (getline(mseStream, mseLine)){
@@ -62,18 +65,14 @@ int main(int argc, char **argv) {
                 }
             }
             if (currentIndent > childIndent){
-                childIndent = currentIndent;
-                parent = previousNode;
+                //A sudden indent by multiple tabs only counts as one hierarchy layer
+                childIndent++;
             }
             else if (currentIndent < childIndent){
                 childIndent = currentIndent;
-                if (parent.getParent() == nullptr){
-                    parent = root;
-                }
-                else {
-                    parent = *parent.getParent();
-                }
             }
+
+
 
             std::string key;
             std::string value;
@@ -85,11 +84,13 @@ int main(int argc, char **argv) {
             else{
                 value = mseLine;
             }
+            value.erase(value.begin(), std::find_if(value.begin(), value.end(), [](int c){ return !std::isspace(c); }));
+            value.erase(std::find_if(value.rbegin(), value.rend(), [](int c){ return !std::isspace(c); }).base(), value.end());
 
-            domain::MSEDataNode mseNode(std::make_shared(parent));
-            mseNode.setValue(value);
-            parent.addChild(key, mseNode);
-            previousNode = mseNode;
+            std::shared_ptr<domain::MSEDataNode> mseNode = std::make_shared<domain::MSEDataNode>();
+            mseNode->setValue(value);
+            parents[childIndent]->addChild(key, mseNode);
+            parents[childIndent+1] = mseNode;
         }
 
         io::CDBAccess cdbAccess(cdbPath);
@@ -101,8 +102,14 @@ int main(int argc, char **argv) {
             std::cout << "Oh wow, you managed to make the test call throw an exception. I hope you're proud of yourself." << std::endl;
             std::cerr << e.what() << std::endl;
         }
+
         std::cout << "Oh, but I was totally called for language " << argLanguage << " and template " << argTemplate
                   << " to import " << msePath << " into " << cdbPath << ", which currently contains " << count << " cards." << std::endl;
+
+
+        std::cout << "Behold! The sacred tree which I have grown from your input!" << std::endl << std::endl;
+        std::cout << root->toString() << std::endl;
+
     }
     
     return 0;

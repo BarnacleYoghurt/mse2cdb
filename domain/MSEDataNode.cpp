@@ -1,14 +1,15 @@
 #include "MSEDataNode.hpp"
+#include <boost/algorithm/string.hpp>
 
 namespace domain {
-    MSEDataNode::MSEDataNode(std::shared_ptr<MSEDataNode> parent) : parent(parent) {
+    MSEDataNode::MSEDataNode() {
     }
 
     void MSEDataNode::setValue(std::string value) {
         this->value = value;
     }
 
-    void MSEDataNode::addChild(std::string key, domain::MSEDataNode node) {
+    void MSEDataNode::addChild(std::string key, std::shared_ptr<MSEDataNode> node) {
         this->children.insert(std::make_pair(key, node));
     }
 
@@ -16,14 +17,10 @@ namespace domain {
         return value;
     }
 
-    std::shared_ptr<MSEDataNode> MSEDataNode::getParent(){
-        return parent;
-    }
-
     MSEDataNode MSEDataNode::getChildNode(std::string key) {
-        std::multimap::iterator it = children.find(key);
-        if (it != children.end()) {
-            return it->second;
+        auto it = children.find(key);
+        if (it != children.end() && it->second != nullptr) {
+            return *(it->second);
         } else {
             return MSEDataNode(*this);
         }
@@ -31,5 +28,21 @@ namespace domain {
 
     std::string MSEDataNode::getChildValue(std::string key) {
         return getChildNode(key).getValue();
+    }
+
+    std::string MSEDataNode::toString(){
+        std::string result;
+        if (!value.empty()){
+            result += value;
+        }
+        for (auto &child : children){
+            std::string part = "\n";
+            part += child.first + ": ";
+            part += child.second->toString();
+            boost::replace_all(part, "\n", "\n\t");
+            result += part;
+        }
+
+        return result;
     }
 }
