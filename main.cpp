@@ -139,6 +139,30 @@ int main(int argc, char **argv) {
             std::cerr << e.what() << std::endl;
         }
 
+        try {
+            domain::CDBCard card;
+            card.id = 8399;
+            card.ot = 0;
+            card.alias = 0;
+            card.setcode = 0;
+            card.type = 71;
+            card.atk = 1500;
+            card.def = 1000;
+            card.level = 4;
+            card.race = 8;
+            card.attribute = 32;
+            card.category = 0;
+            card.name = "Test2";
+            card.desc = "Tests.";
+            for (int i = 0; i<16;i++){
+                card.str[i] = std::to_string(i+1);
+            }
+            cdbAccess.save(card);
+        }
+        catch (const std::runtime_error& e){
+            std::cerr << e.what() << std::endl;
+        }
+
         std::cout << "Oh, but I was totally called for language " << argLanguage << " and template " << argTemplate
                   << " to import " << msePath << " into " << cdbPath << ", which currently contains " << count << " cards." << std::endl;
 

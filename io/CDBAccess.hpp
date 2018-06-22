@@ -3,6 +3,8 @@
 
 #include <string>
 #include <sqlite3.h>
+#include <domain/CDBCard.hpp>
+
 namespace io {
 
     class CDBAccess {
@@ -25,6 +27,13 @@ namespace io {
          * @throw runtime_error If the SQLite statement cannot be created or executed properly.
          */
         int getCardCount();
+
+        /**
+         * Adds or updates the data of a single card.
+         * @param card The card data to use for the operation.
+         * @throw runtime_error If the SQLite statement cannot be created or executed properly.
+         */
+        void save(domain::CDBCard &card);
 
     private:
         sqlite3 *cdb = nullptr;

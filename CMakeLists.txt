@@ -10,7 +10,7 @@ include_directories(./)
 
 set(MAIN_FILES main.cpp)
 set(IO_FILES io/CDBAccess.cpp io/CDBAccess.hpp)
-set(DOMAIN_FILES domain/MSEDataNode.cpp domain/MSEDataNode.hpp)
+set(DOMAIN_FILES domain/MSEDataNode.cpp domain/MSEDataNode.hpp domain/CDBCard.hpp)
 
 add_executable(mse2cdb ${MAIN_FILES} ${IO_FILES} ${DOMAIN_FILES})
 target_link_libraries(mse2cdb ${SQLITE3_LIBRARIES} ${LUA_LIBRARIES})
