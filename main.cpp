@@ -103,13 +103,28 @@ int main(int argc, char **argv) {
         L = luaL_newstate();
         if (L != nullptr) {
             if (!luaL_dofile(L, ("../lua/" + argTemplate + ".lua").c_str())) {
-                    lua_getglobal(L, "cd");
-                    lua_getfield(L, -1, "helloWorld");
-                    if (!lua_pcall(L, 0, 1,0)) {
-                        std::cout << lua_tostring(L, -1) << std::endl;
+                    lua_pushcfunction(L, [](lua_State *L){
+                        const char **result = static_cast<const char**>(lua_touserdata(L, 1));
+
+                        lua_getglobal(L, "cd");
+                        lua_getfield(L, -1, "helloWorld");
+                        lua_call(L,0,1);
+                        *result = lua_tostring(L, -1);
+                        return 0;
+                    });
+                    const char *result = nullptr;
+                    lua_pushlightuserdata(L, &result);
+                    if (!lua_pcall(L,1,0,0)) {
+                        std::cout << result << std::endl;
                     }
                     else{
-                        std::cerr << "Lua Error :(" << std::endl;
+                        const char *errMsg = lua_tostring(L, -1);
+                        if (errMsg != nullptr) {
+                            std::cerr << errMsg << std::endl;
+                        }
+                        else{
+                            std::cerr << "Lua Error :(" << std::endl;
+                        }
                     }
             }
         }
