@@ -5,11 +5,10 @@
 #include "io/CDBAccess.hpp"
 #include "domain/MSEDataNode.hpp"
 
-extern "C"{
-    #include "lua5.1/lua.h"
-    #include "lua5.1/lauxlib.h"
-    #include "lua5.1/lualib.h"
-}
+#include "lua5.1/lua.h"
+#include "lua5.1/lauxlib.h"
+#include "lua5.1/lualib.h"
+
 
 int main(int argc, char **argv) {
     int opt = 0;
@@ -102,13 +101,18 @@ int main(int argc, char **argv) {
         //Call lua script
         lua_State *L;
         L = luaL_newstate();
-        luaL_loadfile(L, ("../lua/" + argTemplate + ".lua").c_str());
-        //lua_getglobal(L, "cd");
-        //lua_getfield(L, -1, "helloWorld");
-        lua_getglobal(L, "helloWorld");
-        lua_call(L,0,1);
-        std::cout << lua_tostring(L, -1) << std::endl;
-
+        if (L != nullptr) {
+            if (!luaL_dofile(L, ("../lua/" + argTemplate + ".lua").c_str())) {
+                    lua_getglobal(L, "cd");
+                    lua_getfield(L, -1, "helloWorld");
+                    if (!lua_pcall(L, 0, 1,0)) {
+                        std::cout << lua_tostring(L, -1) << std::endl;
+                    }
+                    else{
+                        std::cerr << "Lua Error :(" << std::endl;
+                    }
+            }
+        }
 
         io::CDBAccess cdbAccess(cdbPath);
         int count =  0;

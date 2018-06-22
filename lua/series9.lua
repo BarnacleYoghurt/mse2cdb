@@ -1,7 +1,7 @@
 CardData={}
 cd=CardData
 
-function helloWorld()
+function CardData.helloWorld()
 	return "Hello world";
 end
 
