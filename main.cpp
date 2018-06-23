@@ -9,6 +9,9 @@
 #include "lua5.1/lauxlib.h"
 #include "lua5.1/lualib.h"
 
+#include <zip.h>
+#include <sstream>
+
 
 int main(int argc, char **argv) {
     int opt = 0;
@@ -50,8 +53,15 @@ int main(int argc, char **argv) {
     else {
         //Generate MSE tree
         std::string mseLine;
-        //TODO: Open the contained set file when given a .mse file
-        std::ifstream mseStream(msePath);
+        int zipErr = 0;
+        zip *zipFile =  zip_open(msePath.c_str(), ZIP_RDONLY, &zipErr);
+        zip_file *set = zip_fopen(zipFile, "set", 0);
+        struct zip_stat setStats;
+        zip_stat(zipFile, "set", ZIP_STAT_SIZE, &setStats);
+        char *buf = (char *)malloc(setStats.size);
+        zip_fread(set, buf, setStats.size);
+
+        std::stringstream mseStream(buf);
 
         std::shared_ptr<domain::MSEDataNode> root = std::make_shared<domain::MSEDataNode>();
         std::shared_ptr<domain::MSEDataNode> currentParent;
