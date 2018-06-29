@@ -76,13 +76,13 @@ function CardData.type(data)
 	end
 	return result
 end
-function atk(data)
+function CardData.atk(data)
 	return data:GetValue("attack")
 end
-function def(data)
+function CardData.def(data)
 	return data:GetValue("defense")
 end
-function level(data)
+function CardData.level(data)
 	local result = data:GetValue("level"):gsub("[^\\*]", ""):len()
 	
 	local isPendulum = (bit.band(cd.type(data), TYPE_PENDULUM) > 0)
@@ -93,9 +93,9 @@ function level(data)
 	end
 	return result
 end
-function race(data)
+function CardData.race(data)
 	return races[data:GetValue("type 1")]
 end
-function attribute(data)
+function CardData.attribute(data)
 	return attributes[data:GetValue("attribute")]
 end

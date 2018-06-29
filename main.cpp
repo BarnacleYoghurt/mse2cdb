@@ -14,6 +14,8 @@
 #include <io/MSEReader.hpp>
 
 
+std::shared_ptr<domain::MSEDataNode> buildMseTree(const std::string &setData);
+
 int main(int argc, char **argv) {
     int opt = 0;
     int indexptr = 0;
@@ -61,51 +63,7 @@ int main(int argc, char **argv) {
         catch (std::exception &e){
             std::cerr << e.what() << std::endl;
         }
-        std::stringstream mseStream(setData);
-
-        std::string mseLine;
-        std::shared_ptr<domain::MSEDataNode> root = std::make_shared<domain::MSEDataNode>();
-        std::shared_ptr<domain::MSEDataNode> currentParent;
-        std::map<int, std::shared_ptr<domain::MSEDataNode>> parents;
-        parents[0] = root;
-        int childIndent = 0;
-
-        while (getline(mseStream, mseLine)){
-            int currentIndent = 0;
-            for (char c : mseLine){
-                if (c == '\t'){
-                    currentIndent++;
-                }
-                else{
-                    break;
-                }
-            }
-            if (currentIndent > childIndent){
-                //A sudden indent by multiple tabs only counts as one hierarchy layer
-                childIndent++;
-            }
-            else if (currentIndent < childIndent){
-                childIndent = currentIndent;
-            }
-
-            std::string key;
-            std::string value;
-            size_t sepPos = mseLine.find(':');
-            if (sepPos != std::string::npos){
-                key = mseLine.substr(0,sepPos);
-                value = mseLine.substr(sepPos + 1);
-            }
-            else{
-                value = mseLine;
-            }
-            value.erase(value.begin(), std::find_if(value.begin(), value.end(), [](int c){ return !std::isspace(c); }));
-            value.erase(std::find_if(value.rbegin(), value.rend(), [](int c){ return !std::isspace(c); }).base(), value.end());
-
-            std::shared_ptr<domain::MSEDataNode> mseNode = std::make_shared<domain::MSEDataNode>();
-            mseNode->setValue(value);
-            parents[childIndent]->addChild(key, mseNode);
-            parents[childIndent+1] = mseNode;
-        }
+        std::shared_ptr<domain::MSEDataNode> root = buildMseTree(setData);
 
         //Call lua script
         lua_State *L;
@@ -182,4 +140,53 @@ int main(int argc, char **argv) {
     }
     
     return 0;
+}
+
+std::shared_ptr<domain::MSEDataNode> buildMseTree(const std::string &setData) {
+    std::stringstream mseStream(setData);
+
+    std::__cxx11::string mseLine;
+    std::shared_ptr<domain::MSEDataNode> root = std::make_shared<domain::MSEDataNode>();
+    std::shared_ptr<domain::MSEDataNode> currentParent;
+    std::map<int, std::shared_ptr<domain::MSEDataNode>> parents;
+    parents[0] = root;
+    int childIndent = 0;
+
+    while (getline(mseStream, mseLine)){
+            int currentIndent = 0;
+            for (char c : mseLine){
+                if (c == '\t'){
+                    currentIndent++;
+                }
+                else{
+                    break;
+                }
+            }
+            if (currentIndent > childIndent){
+                //A sudden indent by multiple tabs only counts as one hierarchy layer
+                childIndent++;
+            }
+            else if (currentIndent < childIndent){
+                childIndent = currentIndent;
+            }
+
+            std::__cxx11::string key;
+            std::__cxx11::string value;
+            size_t sepPos = mseLine.find(':');
+            if (sepPos != std::__cxx11::basic_string::npos){
+                key = mseLine.substr(0,sepPos);
+                value = mseLine.substr(sepPos + 1);
+            }
+            else{
+                value = mseLine;
+            }
+            value.erase(value.begin(), find_if(value.begin(), value.end(), [](int c){ return !isspace(c); }));
+            value.erase(find_if(value.rbegin(), value.rend(), [](int c){ return !isspace(c); }).base(), value.end());
+
+            std::shared_ptr<domain::MSEDataNode> mseNode = std::make_shared<domain::MSEDataNode>();
+            mseNode->setValue(value);
+            parents[childIndent]->addChild(key, mseNode);
+            parents[childIndent+1] = mseNode;
+        }
+    return root;
 }
