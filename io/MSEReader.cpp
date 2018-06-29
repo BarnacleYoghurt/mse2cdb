@@ -1,6 +1,8 @@
 #include <stdexcept>
 #include "MSEReader.hpp"
 
+namespace io{
+
 MSEReader::MSEReader(std::string msePath) {
     int zipErrCode = 0;
     mseFile = zip_open(msePath.c_str(),ZIP_RDONLY,&zipErrCode);
@@ -46,4 +48,6 @@ std::string MSEReader::getErrorMessage(int errorCode) {
     std::string errorMessage = zip_error_strerror(zipError);
     zip_error_fini(zipError);
     return errorMessage;
+}
+
 }

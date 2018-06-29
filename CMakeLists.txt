@@ -14,5 +14,5 @@ set(IO_FILES io/CDBAccess.cpp io/CDBAccess.hpp io/MSEReader.cpp io/MSEReader.hpp
 set(DOMAIN_FILES domain/MSEDataNode.cpp domain/MSEDataNode.hpp domain/CDBCard.hpp)
 set(SERVICE_FILES service/LuaCardData.cpp service/LuaCardData.hpp)
 
-add_executable(mse2cdb ${MAIN_FILES} ${IO_FILES} ${DOMAIN_FILES})
+add_executable(mse2cdb ${MAIN_FILES} ${IO_FILES} ${DOMAIN_FILES} ${SERVICE_FILES})
 target_link_libraries(mse2cdb ${SQLITE3_LIBRARIES} ${LUA_LIBRARIES} ${LIBZIP_LIBRARIES})

@@ -5,8 +5,8 @@ function CardData.helloWorld()
 	return "Hello world";
 end
 
-function CardData.gamecode(data)
-	return data:GetValue("gamecode")
+function CardData.id(data)
+	return data:GetValue("id")
 end
 function CardData.name(data)
 	return data:GetValue("name")

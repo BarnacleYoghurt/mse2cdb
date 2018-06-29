@@ -12,6 +12,7 @@
 #include <zip.h>
 #include <sstream>
 #include <io/MSEReader.hpp>
+#include <service/LuaCardData.hpp>
 
 
 std::shared_ptr<domain::MSEDataNode> buildMseTree(const std::string &setData);
@@ -57,7 +58,7 @@ int main(int argc, char **argv) {
         //Generate MSE tree
         std::string setData;
         try {
-            MSEReader mseReader(msePath);
+            io::MSEReader mseReader(msePath);
             setData = mseReader.getSetData();
         }
         catch (std::exception &e){
@@ -66,36 +67,15 @@ int main(int argc, char **argv) {
         std::shared_ptr<domain::MSEDataNode> root = buildMseTree(setData);
 
         //Call lua script
-        lua_State *L;
-        L = luaL_newstate();
-        if (L != nullptr) {
-            if (!luaL_dofile(L, ("../lua/" + argTemplate + ".lua").c_str())) {
-                    lua_pushcfunction(L, [](lua_State *L){
-                        const char **result = static_cast<const char**>(lua_touserdata(L, 1));
-
-                        lua_getglobal(L, "cd");
-                        lua_getfield(L, -1, "helloWorld");
-                        lua_call(L,0,1);
-                        *result = lua_tostring(L, -1);
-                        return 0;
-                    });
-                    const char *result = nullptr;
-                    lua_pushlightuserdata(L, &result);
-                    if (!lua_pcall(L,1,0,0)) {
-                        std::cout << result << std::endl;
-                    }
-                    else{
-                        const char *errMsg = lua_tostring(L, -1);
-                        if (errMsg != nullptr) {
-                            std::cerr << errMsg << std::endl;
-                        }
-                        else{
-                            std::cerr << "Lua Error :(" << std::endl;
-                        }
-                    }
-            }
+        try {
+            service::LuaCardData luaCardData("../lua/" + argTemplate + ".lua");
+            std::cout << luaCardData.id(root->getChildNode("card")) << std::endl;
+        }
+        catch (std::exception &e){
+            std::cerr << e.what() << std::endl;
         }
 
+        //Update database
         io::CDBAccess cdbAccess(cdbPath);
         int count =  0;
         try {
@@ -145,7 +125,7 @@ int main(int argc, char **argv) {
 std::shared_ptr<domain::MSEDataNode> buildMseTree(const std::string &setData) {
     std::stringstream mseStream(setData);
 
-    std::__cxx11::string mseLine;
+    std::string mseLine;
     std::shared_ptr<domain::MSEDataNode> root = std::make_shared<domain::MSEDataNode>();
     std::shared_ptr<domain::MSEDataNode> currentParent;
     std::map<int, std::shared_ptr<domain::MSEDataNode>> parents;
@@ -170,10 +150,10 @@ std::shared_ptr<domain::MSEDataNode> buildMseTree(const std::string &setData) {
                 childIndent = currentIndent;
             }
 
-            std::__cxx11::string key;
-            std::__cxx11::string value;
+            std::string key;
+            std::string value;
             size_t sepPos = mseLine.find(':');
-            if (sepPos != std::__cxx11::basic_string::npos){
+            if (sepPos != std::string::npos){
                 key = mseLine.substr(0,sepPos);
                 value = mseLine.substr(sepPos + 1);
             }
