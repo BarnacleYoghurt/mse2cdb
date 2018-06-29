@@ -11,6 +11,7 @@
 
 #include <zip.h>
 #include <sstream>
+#include <io/MSEReader.hpp>
 
 
 int main(int argc, char **argv) {
@@ -52,17 +53,17 @@ int main(int argc, char **argv) {
     }
     else {
         //Generate MSE tree
+        std::string setData;
+        try {
+            MSEReader mseReader(msePath);
+            setData = mseReader.getSetData();
+        }
+        catch (std::exception &e){
+            std::cerr << e.what() << std::endl;
+        }
+        std::stringstream mseStream(setData);
+
         std::string mseLine;
-        int zipErr = 0;
-        zip *zipFile =  zip_open(msePath.c_str(), ZIP_RDONLY, &zipErr);
-        zip_file *set = zip_fopen(zipFile, "set", 0);
-        struct zip_stat setStats;
-        zip_stat(zipFile, "set", ZIP_STAT_SIZE, &setStats);
-        char *buf = (char *)malloc(setStats.size);
-        zip_fread(set, buf, setStats.size);
-
-        std::stringstream mseStream(buf);
-
         std::shared_ptr<domain::MSEDataNode> root = std::make_shared<domain::MSEDataNode>();
         std::shared_ptr<domain::MSEDataNode> currentParent;
         std::map<int, std::shared_ptr<domain::MSEDataNode>> parents;
@@ -86,8 +87,6 @@ int main(int argc, char **argv) {
             else if (currentIndent < childIndent){
                 childIndent = currentIndent;
             }
-
-
 
             std::string key;
             std::string value;
