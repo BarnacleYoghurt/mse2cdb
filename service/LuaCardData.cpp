@@ -8,6 +8,7 @@ namespace service{
         if (state == nullptr){
             throw std::runtime_error("Could not create initial Lua state.");
         }
+        luaL_openlibs(state);
         if (luaL_dofile(state, templatePath.c_str()) == 1){
             throw std::runtime_error("Could not load Lua script for selected template (" + templatePath + ")");
         }

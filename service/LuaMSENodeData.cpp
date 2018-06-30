@@ -10,7 +10,7 @@ namespace service{
             } else {
                 lua_pushstring(state, "");
             }
-            return 0;
+            return 1;
         }
     }
 }
