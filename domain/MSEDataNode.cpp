@@ -13,11 +13,11 @@ namespace domain {
         this->children.insert(std::make_pair(key, node));
     }
 
-    std::string MSEDataNode::getValue() {
+    std::string MSEDataNode::getValue() const {
         return value;
     }
 
-    MSEDataNode MSEDataNode::getChildNode(std::string key) {
+    MSEDataNode MSEDataNode::getChildNode(std::string key) const {
         auto it = children.find(key);
         if (it != children.end() && it->second != nullptr) {
             return *(it->second);
@@ -26,11 +26,11 @@ namespace domain {
         }
     }
 
-    std::string MSEDataNode::getChildValue(std::string key) {
+    std::string MSEDataNode::getChildValue(std::string key) const {
         return getChildNode(key).getValue();
     }
 
-    std::string MSEDataNode::toString(){
+    std::string MSEDataNode::toString() const{
         std::string result;
         if (!value.empty()){
             result += value;

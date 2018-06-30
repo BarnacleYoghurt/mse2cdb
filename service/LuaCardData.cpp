@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include "LuaCardData.hpp"
+#include "LuaMSENodeData.hpp"
 
 namespace service{
     LuaCardData::LuaCardData(const std::string &templatePath) {
@@ -26,6 +27,14 @@ namespace service{
             lua_getglobal(state, "cd");
             lua_getfield(state, -1, "id");
             lua_pushlightuserdata(state, dataParam);
+
+            luaL_newmetatable(state, "NodeData");
+            lua_pushvalue(state, -1);
+            lua_setfield(state, -2, "__index");
+            lua_pushcfunction(state, mseNodeData::getChildValue);
+            lua_setfield(state, -2, "GetChildValue");
+            lua_setmetatable(state, 5);
+
             lua_call(state,1,1);
             *result = (int)lua_tointeger(state, -1);
             return 0;
@@ -39,10 +48,10 @@ namespace service{
         else{
             const char *errMsg = lua_tostring(state, -1);
             if (errMsg != nullptr) {
-                throw std::runtime_error("An error occurred in a Lua call to get id (" + std::string(errMsg) + ")");
+                throw std::runtime_error("An error occurred in Lua call to get id (" + std::string(errMsg) + ")");
             }
             else{
-                throw std::runtime_error("An error occurred in a Lua call to get id.");
+                throw std::runtime_error("An error occurred in Lua call to get id.");
             }
         }
     }

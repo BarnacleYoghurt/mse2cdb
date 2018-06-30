@@ -6,7 +6,7 @@ function CardData.helloWorld()
 end
 
 function CardData.id(data)
-	return data:GetValue("id")
+	return data:GetChildValue("gamecode")
 end
 function CardData.name(data)
 	return data:GetValue("name")

@@ -162,6 +162,8 @@ std::shared_ptr<domain::MSEDataNode> buildMseTree(const std::string &setData) {
             }
             value.erase(value.begin(), find_if(value.begin(), value.end(), [](int c){ return !isspace(c); }));
             value.erase(find_if(value.rbegin(), value.rend(), [](int c){ return !isspace(c); }).base(), value.end());
+            key.erase(key.begin(), find_if(key.begin(), key.end(), [](int c){ return !isspace(c); }));
+            key.erase(find_if(key.rbegin(), key.rend(), [](int c){ return !isspace(c); }).base(), key.end());
 
             std::shared_ptr<domain::MSEDataNode> mseNode = std::make_shared<domain::MSEDataNode>();
             mseNode->setValue(value);
