@@ -32,7 +32,6 @@ function CardData.setcode(data)
 end
 function CardData.type(data)
 	local result = 0x0
-	
 	local cardframe = data:GetChildNode("extra data"):GetChildNode("yugioh-standard-extra"):GetChildValue("card frame")
 	if cardframe:find("token") then
 		result = TYPE_MONSTER + TYPE_NORMAL + TYPE_TOKEN
@@ -67,10 +66,10 @@ function CardData.type(data)
 	return result
 end
 function CardData.atk(data)
-	return data:GetValue("attack")
+	return data:GetChildValue("attack")
 end
 function CardData.def(data)
-	return data:GetValue("defense")
+	return data:GetChildValue("defense")
 end
 function CardData.level(data)
 	local result = data:GetValue("level"):gsub("[^\\*]", ""):len()

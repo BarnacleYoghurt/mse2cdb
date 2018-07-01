@@ -26,39 +26,47 @@ namespace service {
         ~LuaCardData();
 
         /**
-         * @brief Get id field using the corresponding function of the loaded script.
+         * @brief Get id field using the corresponding function of the loaded template script.
          * @param data The MSEDataNode from which id should be read.
          * @return The id returned by the function in the script; 0 if that value is negative or not a number.
          */
         unsigned int id(const domain::MSEDataNode &data);
         /**
-         * @brief Get ot field using the corresponding function of the loaded script.
+         * @brief Get ot field using the corresponding function of the loaded template script.
          * @param data The MSEDataNode from which ot should be read.
          * @return The id returned by the function in the script; 0 if that value is not a number.
          */
         int ot(const domain::MSEDataNode &data);
         /**
-         * @brief Get alias field using the corresponding function of the loaded script.
+         * @brief Get alias field using the corresponding function of the loaded template script.
          * @param data The MSEDataNode from which alias should be read.
          * @return The alias returned by the function in the script; 0 if that value is negative or not a number.
          */
         unsigned int alias(const domain::MSEDataNode &data);
         /**
-         * @brief Get setcode field using the corresponding function of the loaded script.
+         * @brief Get setcode field using the corresponding function of the loaded template script.
          * @param data The MSEDataNode from which setcode should be read.
          * @return The setcode returned by the function in the script; 0 if that value is negative or not a number.
          */
         unsigned long setcode(const domain::MSEDataNode &data);
         /**
-         * @brief Get type field using the corresponding function of the loaded script.
+         * @brief Get type field using the corresponding function of the loaded template script.
          * @param data The MSEDataNode from which type should be read.
          * @return The type returned by the function in the script; 0 if that value is negative or not a number.
          */
         unsigned int type(const domain::MSEDataNode &data);
-
-        int atk();
-
-        int def();
+        /**
+         * @brief Get atk field using the corresponding function of the loaded template script.
+         * @param data The MSEDataNode from which atk should be read.
+         * @return The atk returned by the function in the script; 0 if that value is not a number.
+         */
+        int atk(const domain::MSEDataNode &data);
+        /**
+         * @brief Get def field using the corresponding function of the loaded template script.
+         * @param data The MSEDataNode from which def should be read.
+         * @return The def returned by the function in the script; 0 if that value is not a number.
+         */
+        int def(const domain::MSEDataNode &data);
 
         unsigned long level();
 
@@ -69,7 +77,7 @@ namespace service {
         long category();
 
         /**
-         * @brief Get name field using the corresponding function of the loaded script.
+         * @brief Get name field using the corresponding function of the loaded template script.
          * @param data The MSEDataNode from which name should be read.
          * @return The name returned by the function in the script.
          */

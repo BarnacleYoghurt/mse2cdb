@@ -120,6 +120,40 @@ namespace service{
         }
     }
 
+    int LuaCardData::atk(const domain::MSEDataNode &data) {
+        lua_Integer result = 0;
+
+        if (pcallCardDataFunction<lua_Integer>("atk",data,&result,&lua_tointeger) == 0) {
+            return (int)result;
+        }
+        else{
+            const char *errMsg = lua_tostring(state, -1);
+            if (errMsg != nullptr) {
+                throw std::runtime_error("An error occurred in Lua call to get atk (" + std::string(errMsg) + ")");
+            }
+            else{
+                throw std::runtime_error("An error occurred in Lua call to get atk.");
+            }
+        }
+    }
+
+    int LuaCardData::def(const domain::MSEDataNode &data) {
+        lua_Integer result = 0;
+
+        if (pcallCardDataFunction<lua_Integer>("def",data,&result,&lua_tointeger) == 0) {
+            return (int)result;
+        }
+        else{
+            const char *errMsg = lua_tostring(state, -1);
+            if (errMsg != nullptr) {
+                throw std::runtime_error("An error occurred in Lua call to get def (" + std::string(errMsg) + ")");
+            }
+            else{
+                throw std::runtime_error("An error occurred in Lua call to get def.");
+            }
+        }
+    }
+
     std::string LuaCardData::name(const domain::MSEDataNode &data) {
         std::string result;
 

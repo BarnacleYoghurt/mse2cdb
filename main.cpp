@@ -75,6 +75,8 @@ int main(int argc, char **argv) {
             std::cout << luaCardData.alias(testNode) << std::endl;
             std::cout << luaCardData.setcode(testNode) << std::endl;
             std::cout << luaCardData.type(testNode) << std::endl;
+            std::cout << luaCardData.atk(testNode) << std::endl;
+            std::cout << luaCardData.def(testNode) << std::endl;
             std::cout << luaCardData.name(testNode) << std::endl;
         }
         catch (std::exception &e){
