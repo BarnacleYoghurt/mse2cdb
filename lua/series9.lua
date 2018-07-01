@@ -33,11 +33,11 @@ end
 function CardData.type(data)
 	local result = 0x0
 	
-	local cardframe = data:GetMultilineValue("extra data"):GetMultilineValue("yugioh-standard-extra"):GetValue("card frame")
+	local cardframe = data:GetChildNode("extra data"):GetChildNode("yugioh-standard-extra"):GetChildValue("card frame")
 	if cardframe:find("token") then
 		result = TYPE_MONSTER + TYPE_NORMAL + TYPE_TOKEN
 	else
-		local level = aux.SymEscape(data:GetValue("level"))
+		local level = aux.SymEscape(data:GetChildValue("level"))
 		if level:find("Spell") then
 			result = result + TYPE_SPELL
 		elseif level:find("Trap") then
@@ -49,10 +49,11 @@ function CardData.type(data)
 		if result == TYPE_MONSTER then
 			local nextType = 2
 			local hasSubtype = false
-			while data:GetValue("type "..nextType) do
-				if subtype[data:GetValue("type"..nextType)] then
+			while data:GetChildValue("type "..nextType) ~= "" do
+				local escaped = aux.SymEscape(data:GetChildValue("type "..nextType))
+				if subtypes[escaped] then
 					hasSubtype = true
-					result = result + subtype[data:GetValue("type"..nextType)]
+					result = result + subtypes[escaped]
 				end
 				nextType = nextType + 1
 			end

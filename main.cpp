@@ -69,11 +69,13 @@ int main(int argc, char **argv) {
         //Call lua script
         try {
             service::LuaCardData luaCardData(argTemplate, argLanguage);
-            std::cout << luaCardData.id(root->getChildNode("card")) << std::endl;
-            std::cout << luaCardData.ot(root->getChildNode("card")) << std::endl;
-            std::cout << luaCardData.alias(root->getChildNode("card")) << std::endl;
-            std::cout << luaCardData.setcode(root->getChildNode("card")) << std::endl;
-            std::cout << luaCardData.name(root->getChildNode("card")) << std::endl;
+            domain::MSEDataNode testNode = root->getChildNode("card");
+            std::cout << luaCardData.id(testNode) << std::endl;
+            std::cout << luaCardData.ot(testNode) << std::endl;
+            std::cout << luaCardData.alias(testNode) << std::endl;
+            std::cout << luaCardData.setcode(testNode) << std::endl;
+            std::cout << luaCardData.type(testNode) << std::endl;
+            std::cout << luaCardData.name(testNode) << std::endl;
         }
         catch (std::exception &e){
             std::cerr << e.what() << std::endl;

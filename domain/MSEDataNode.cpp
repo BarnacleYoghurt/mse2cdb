@@ -22,7 +22,7 @@ namespace domain {
         if (it != children.end() && it->second != nullptr) {
             return *(it->second);
         } else {
-            return MSEDataNode(*this);
+            return MSEDataNode();
         }
     }
 

@@ -49,8 +49,12 @@ namespace service {
          * @return The setcode returned by the function in the script; 0 if that value is negative or not a number.
          */
         unsigned long setcode(const domain::MSEDataNode &data);
-
-        unsigned int type();
+        /**
+         * @brief Get type field using the corresponding function of the loaded script.
+         * @param data The MSEDataNode from which type should be read.
+         * @return The type returned by the function in the script; 0 if that value is negative or not a number.
+         */
+        unsigned int type(const domain::MSEDataNode &data);
 
         int atk();
 

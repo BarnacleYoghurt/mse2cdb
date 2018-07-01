@@ -103,6 +103,23 @@ namespace service{
         }
     }
 
+    unsigned int LuaCardData::type(const domain::MSEDataNode &data) {
+        lua_Integer result = 0;
+
+        if (pcallCardDataFunction<lua_Integer>("type",data,&result,&lua_tointeger) == 0) {
+            return result>=0?(unsigned int)result:0;
+        }
+        else{
+            const char *errMsg = lua_tostring(state, -1);
+            if (errMsg != nullptr) {
+                throw std::runtime_error("An error occurred in Lua call to get alias (" + std::string(errMsg) + ")");
+            }
+            else{
+                throw std::runtime_error("An error occurred in Lua call to get alias.");
+            }
+        }
+    }
+
     std::string LuaCardData::name(const domain::MSEDataNode &data) {
         std::string result;
 
@@ -124,6 +141,8 @@ namespace service{
         luaL_newmetatable(state, "NodeData");
         lua_pushvalue(state, -1);
         lua_setfield(state, -2, "__index");
+        lua_pushcfunction(state, mseNodeData::getChildNode);
+        lua_setfield(state, -2, "GetChildNode");
         lua_pushcfunction(state, mseNodeData::getChildValue);
         lua_setfield(state, -2, "GetChildValue");
         lua_pushcfunction(state, mseNodeData::getChildFullContent);

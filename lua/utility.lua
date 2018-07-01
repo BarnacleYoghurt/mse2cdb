@@ -7,3 +7,6 @@ end
 function Auxiliary.PendulumLevel(level,lscale,rscale)
 	return tonumber(string.format('%x',lscale).."0"..string.format('%x',rscale).."000"..string.format("%x",level), 16)
 end
+function Auxiliary.SymEscape(text)
+	return text:gsub("<.+>(.*)</.+>", "%1")
+end

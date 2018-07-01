@@ -9,6 +9,7 @@
 
 namespace service {
     namespace mseNodeData {
+        int getChildNode(lua_State *state);
         int getChildValue(lua_State *state);
         int getChildFullContent(lua_State *state);
     }
