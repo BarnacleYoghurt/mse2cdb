@@ -1,6 +1,7 @@
 #include <stdexcept>
 #include "LuaCardData.hpp"
 #include "LuaMSENodeData.hpp"
+#include "LuaConverters.hpp"
 
 namespace service{
     LuaCardData::LuaCardData(const std::string &templatePath) {
@@ -12,6 +13,7 @@ namespace service{
         if (luaL_dofile(state, templatePath.c_str()) == 1){
             throw std::runtime_error("Could not load Lua script for selected template (" + templatePath + ")");
         }
+        createNodeDataMetatable();
     }
 
     LuaCardData::~LuaCardData() {
@@ -21,29 +23,9 @@ namespace service{
     }
 
     unsigned int LuaCardData::id(const domain::MSEDataNode &data) {
-        lua_pushcfunction(state, [](lua_State *state){
-            auto *result = static_cast<int*>(lua_touserdata(state, 1));
-            auto *dataParam = static_cast<domain::MSEDataNode*>(lua_touserdata(state, 2));
+        lua_Integer result = 0;
 
-            lua_getglobal(state, "cd");
-            lua_getfield(state, -1, "id");
-            lua_pushlightuserdata(state, dataParam);
-
-            luaL_newmetatable(state, "NodeData");
-            lua_pushvalue(state, -1);
-            lua_setfield(state, -2, "__index");
-            lua_pushcfunction(state, mseNodeData::getChildValue);
-            lua_setfield(state, -2, "GetChildValue");
-            lua_setmetatable(state, 5);
-
-            lua_call(state,1,1);
-            *result = (int)lua_tointeger(state, -1);
-            return 0;
-        });
-        int result = 0;
-        lua_pushlightuserdata(state, &result);
-        lua_pushlightuserdata(state, (domain::MSEDataNode*)&data);
-        if (lua_pcall(state,2,0,0) == 0) {
+        if (pcallCardDataFunction<lua_Integer>("id",data,&result,&lua_tointeger) == 0) {
             return result>=0?(unsigned int)result:0;
         }
         else{
@@ -55,5 +37,47 @@ namespace service{
                 throw std::runtime_error("An error occurred in Lua call to get id.");
             }
         }
+    }
+
+    int LuaCardData::ot(const domain::MSEDataNode &data) {
+        lua_Integer result = 0;
+
+        if (pcallCardDataFunction<lua_Integer>("ot",data,&result,&lua_tointeger) == 0) {
+            return (int)result;
+        }
+        else{
+            const char *errMsg = lua_tostring(state, -1);
+            if (errMsg != nullptr) {
+                throw std::runtime_error("An error occurred in Lua call to get ot (" + std::string(errMsg) + ")");
+            }
+            else{
+                throw std::runtime_error("An error occurred in Lua call to get ot.");
+            }
+        }
+    }
+
+    std::string LuaCardData::name(const domain::MSEDataNode &data) {
+        std::string result;
+
+        if (pcallCardDataFunction<std::string>("name",data,&result,&lua_toStdString) == 0) {
+            return result;
+        }
+        else{
+            const char *errMsg = lua_tostring(state, -1);
+            if (errMsg != nullptr) {
+                throw std::runtime_error("An error occurred in Lua call to get name (" + std::string(errMsg) + ")");
+            }
+            else{
+                throw std::runtime_error("An error occurred in Lua call to get name.");
+            }
+        }
+    }
+
+    void LuaCardData::createNodeDataMetatable() {
+        luaL_newmetatable(state, "NodeData");
+        lua_pushvalue(state, -1);
+        lua_setfield(state, -2, "__index");
+        lua_pushcfunction(state, mseNodeData::getChildValue);
+        lua_setfield(state, -2, "GetChildValue");
     }
 }

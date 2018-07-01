@@ -70,6 +70,8 @@ int main(int argc, char **argv) {
         try {
             service::LuaCardData luaCardData("../lua/" + argTemplate + ".lua");
             std::cout << luaCardData.id(root->getChildNode("card")) << std::endl;
+            std::cout << luaCardData.ot(root->getChildNode("card")) << std::endl;
+            std::cout << luaCardData.name(root->getChildNode("card")) << std::endl;
         }
         catch (std::exception &e){
             std::cerr << e.what() << std::endl;

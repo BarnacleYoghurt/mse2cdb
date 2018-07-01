@@ -8,6 +8,7 @@
 #include "lua5.1/lua.h"
 #include "lua5.1/lauxlib.h"
 #include "lua5.1/lualib.h"
+#include "LuaMSENodeData.hpp"
 
 
 namespace service {
@@ -30,8 +31,12 @@ namespace service {
          * @return The id returned by the function in the script; 0 if that value is negative or not a number.
          */
         unsigned int id(const domain::MSEDataNode &data);
-
-        int ot();
+        /**
+         * @brief Get ot field using the corresponding function of the loaded script.
+         * @param data The MSEDataNode from which ot should be read.
+         * @return The id returned by the function in the script; 0 if that value is not a number.
+         */
+        int ot(const domain::MSEDataNode &data);
 
         unsigned int alias();
 
@@ -51,8 +56,48 @@ namespace service {
 
         long category();
 
+        /**
+         * @brief Get name field using the corresponding function of the loaded script.
+         * @param data The MSEDataNode from which name should be read.
+         * @return The name returned by the function in the script.
+         */
+        std::string name(const domain::MSEDataNode &data);
+
+        std::string desc();
+
+        std::array<std::string, 16> str();
+
+        template<typename T>
+        int pcallCardDataFunction(const char *functionName, const domain::MSEDataNode &data, T *outVar, T (*converter)(lua_State*, int)){
+            lua_CFunction protectedFunction = [](lua_State *state){
+                const char *functionNameParam = lua_tostring(state, 1);
+                auto *converterParam = reinterpret_cast<T (*)(lua_State*, int)>(lua_touserdata(state, 2));
+                auto *resultParam = static_cast<T*>(lua_touserdata(state, 3));
+                auto *dataParam = static_cast<domain::MSEDataNode*>(lua_touserdata(state, 4));
+
+                lua_getglobal(state, "cd");
+                lua_getfield(state, -1, functionNameParam);
+                lua_pushlightuserdata(state, dataParam);
+
+                luaL_getmetatable(state, "NodeData"); //Put metatable on stack
+                lua_setmetatable(state, -2); //and pop it off again
+
+                lua_call(state,1,1);
+                *resultParam = converterParam(state, -1);
+                return 0;
+            };
+
+            lua_pushcfunction(state, protectedFunction);
+            lua_pushstring(state, functionName);
+            lua_pushlightuserdata(state, reinterpret_cast<void*>(converter));
+            lua_pushlightuserdata(state, outVar);
+            lua_pushlightuserdata(state, (domain::MSEDataNode*)&data);
+            return lua_pcall(state,4,0,0);
+        }
+
     private:
         lua_State *state;
+        void createNodeDataMetatable();
     };
 }
 

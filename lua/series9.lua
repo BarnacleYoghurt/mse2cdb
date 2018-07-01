@@ -8,8 +8,11 @@ end
 function CardData.id(data)
 	return data:GetChildValue("gamecode")
 end
+function CardData.ot(data)
+	return 1
+end
 function CardData.name(data)
-	return data:GetValue("name")
+	return data:GetChildValue("name")
 end
 function CardData.desc(data)
 	return data:GetMultilineValue("rule text")
