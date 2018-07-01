@@ -3,10 +3,11 @@
 
 #include <string>
 
-#include "lua5.1/lua.h"
-#include "lua5.1/lauxlib.h"
-#include "lua5.1/lualib.h"
+#include "lua5.3/lua.h"
+#include "lua5.3/lauxlib.h"
+#include "lua5.3/lualib.h"
 
-std::string lua_toStdString(lua_State *L, int i);
+std::string lua_conv_toStdString(lua_State *L, int i);
+lua_Integer lua_conv_tointeger(lua_State *L, int i);
 
 #endif //MSE2CDB_LUACONVERTERS_HPP

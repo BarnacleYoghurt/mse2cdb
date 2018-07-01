@@ -21,6 +21,7 @@ namespace service{
             throw std::runtime_error("Could not load Lua script for selected template (" + io::luaScriptFinder::getTemplatePath(templateName) + ")");
         }
         if (luaL_dofile(state, io::luaScriptFinder::getDictPath(language).c_str()) == 1){
+            const char *errMsg = lua_tostring(state, -1);
             throw std::runtime_error("Could not load dictionary for selected language (" + io::luaScriptFinder::getDictPath(language) + ")");
         }
         if (luaL_dofile(state, io::luaScriptFinder::getArchetypesPath(language).c_str()) == 1){
@@ -38,7 +39,7 @@ namespace service{
     unsigned int LuaCardData::id(const domain::MSEDataNode &data) {
         lua_Integer result = 0;
 
-        if (pcallCardDataFunction<lua_Integer>("id",data,&result,&lua_tointeger) == 0) {
+        if (pcallCardDataFunction<lua_Integer>("id",data,&result, &lua_conv_tointeger) == 0) {
             return result>=0?(unsigned int)result:0;
         }
         else{
@@ -55,7 +56,7 @@ namespace service{
     int LuaCardData::ot(const domain::MSEDataNode &data) {
         lua_Integer result = 0;
 
-        if (pcallCardDataFunction<lua_Integer>("ot",data,&result,&lua_tointeger) == 0) {
+        if (pcallCardDataFunction<lua_Integer>("ot",data,&result,&lua_conv_tointeger) == 0) {
             return (int)result;
         }
         else{
@@ -72,7 +73,7 @@ namespace service{
     unsigned int LuaCardData::alias(const domain::MSEDataNode &data) {
         lua_Integer result = 0;
 
-        if (pcallCardDataFunction<lua_Integer>("alias",data,&result,&lua_tointeger) == 0) {
+        if (pcallCardDataFunction<lua_Integer>("alias",data,&result,&lua_conv_tointeger) == 0) {
             return result>=0?(unsigned int)result:0;
         }
         else{
@@ -89,7 +90,7 @@ namespace service{
     unsigned long LuaCardData::setcode(const domain::MSEDataNode &data) {
         lua_Integer result = 0;
 
-        if (pcallCardDataFunction<lua_Integer>("setcode",data,&result,&lua_tointeger) == 0) {
+        if (pcallCardDataFunction<lua_Integer>("setcode",data,&result,&lua_conv_tointeger) == 0) {
             return result>=0?(unsigned long)result:0;
         }
         else{
@@ -106,7 +107,7 @@ namespace service{
     unsigned int LuaCardData::type(const domain::MSEDataNode &data) {
         lua_Integer result = 0;
 
-        if (pcallCardDataFunction<lua_Integer>("type",data,&result,&lua_tointeger) == 0) {
+        if (pcallCardDataFunction<lua_Integer>("type",data,&result,&lua_conv_tointeger) == 0) {
             return result>=0?(unsigned int)result:0;
         }
         else{
@@ -123,7 +124,7 @@ namespace service{
     int LuaCardData::atk(const domain::MSEDataNode &data) {
         lua_Integer result = 0;
 
-        if (pcallCardDataFunction<lua_Integer>("atk",data,&result,&lua_tointeger) == 0) {
+        if (pcallCardDataFunction<lua_Integer>("atk",data,&result,&lua_conv_tointeger) == 0) {
             return (int)result;
         }
         else{
@@ -140,7 +141,7 @@ namespace service{
     int LuaCardData::def(const domain::MSEDataNode &data) {
         lua_Integer result = 0;
 
-        if (pcallCardDataFunction<lua_Integer>("def",data,&result,&lua_tointeger) == 0) {
+        if (pcallCardDataFunction<lua_Integer>("def",data,&result,&lua_conv_tointeger) == 0) {
             return (int)result;
         }
         else{
@@ -157,7 +158,7 @@ namespace service{
     unsigned long LuaCardData::level(const domain::MSEDataNode &data) {
         lua_Integer result = 0;
 
-        if (pcallCardDataFunction<lua_Integer>("level",data,&result,&lua_tointeger) == 0) {
+        if (pcallCardDataFunction<lua_Integer>("level",data,&result,&lua_conv_tointeger) == 0) {
             return result>=0?(unsigned long)result:0;
         }
         else{
@@ -174,7 +175,7 @@ namespace service{
     std::string LuaCardData::name(const domain::MSEDataNode &data) {
         std::string result;
 
-        if (pcallCardDataFunction<std::string>("name",data,&result,&lua_toStdString) == 0) {
+        if (pcallCardDataFunction<std::string>("name",data,&result, &lua_conv_toStdString) == 0) {
             return result;
         }
         else{

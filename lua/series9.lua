@@ -1,3 +1,5 @@
+local bit = require "bit32"
+
 CardData={}
 cd=CardData
 
@@ -74,12 +76,12 @@ end
 function CardData.level(data)
 	local result = data:GetChildValue("level"):gsub("[^\\*]", ""):len()
 	
-	--local isPendulum = (bit.band(cd.type(data), TYPE_PENDULUM) > 0)
-	--if isPendulum then
-	--	local lscale = data:GetChildValue("blue scale")
-	--	local rscale = data:GetChildValue("right scale")
-	--	result = aux.PendulumLevel(result,lscale,rscale)
-	--end
+	local isPendulum = (bit.band(cd.type(data), TYPE_PENDULUM) > 0)
+	if isPendulum then
+		local lscale = data:GetChildValue("blue scale")
+		local rscale = data:GetChildValue("right scale")
+		result = aux.PendulumLevel(result,lscale,rscale)
+	end
 	return result
 end
 function CardData.race(data)

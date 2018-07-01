@@ -53,4 +53,4 @@ attributes = {
 	['dark'] = ATTRIBUTE_DARK,
 	['divine'] = ATTRIBUTE_DEVINE
 }
-treatedAs = "\(This card is always treated as a(n)? \"%s\" card\)"
+treatedAs = "\\(This card is always treated as a(n)? \"%s\" card\\)"
