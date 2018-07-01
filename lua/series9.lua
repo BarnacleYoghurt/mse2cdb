@@ -85,10 +85,13 @@ function CardData.level(data)
 	return result
 end
 function CardData.race(data)
-	return races[data:GetValue("type 1")]
+	return races[aux.SymEscape(data:GetChildValue("type 1"))]
 end
 function CardData.attribute(data)
-	return attributes[data:GetValue("attribute")]
+	return attributes[data:GetChildValue("attribute")]
+end
+function CardData.category(data)
+	return 0
 end
 
 function CardData.name(data)
@@ -97,8 +100,8 @@ end
 function CardData.desc(data)
 	return data:GetChildFullContent("rule text")
 end
-function CardData.strList(data)
-	local notes = aux.GetLines(data:GetMultilineValue("notes"))
+function CardData.str(data)
+	local notes = aux.GetLines(data:GetChildFullContent("notes"))
 	local strs = {}
 	local strIndex = 1
 	for note in notes do

@@ -172,6 +172,57 @@ namespace service{
         }
     }
 
+    unsigned int LuaCardData::race(const domain::MSEDataNode &data) {
+        lua_Integer result = 0;
+
+        if (pcallCardDataFunction<lua_Integer>("race",data,&result,&lua_conv_tointeger) == 0) {
+            return result>=0?(unsigned int)result:0;
+        }
+        else{
+            const char *errMsg = lua_tostring(state, -1);
+            if (errMsg != nullptr) {
+                throw std::runtime_error("An error occurred in Lua call to get race (" + std::string(errMsg) + ")");
+            }
+            else{
+                throw std::runtime_error("An error occurred in Lua call to get race.");
+            }
+        }
+    }
+
+    unsigned int LuaCardData::attribute(const domain::MSEDataNode &data){
+        lua_Integer result = 0;
+
+        if (pcallCardDataFunction<lua_Integer>("attribute",data,&result,&lua_conv_tointeger) == 0) {
+            return result>=0?(unsigned int)result:0;
+        }
+        else{
+            const char *errMsg = lua_tostring(state, -1);
+            if (errMsg != nullptr) {
+                throw std::runtime_error("An error occurred in Lua call to get attribute (" + std::string(errMsg) + ")");
+            }
+            else{
+                throw std::runtime_error("An error occurred in Lua call to get attribute.");
+            }
+        }
+    }
+
+    long LuaCardData::category(const domain::MSEDataNode &data) {
+        lua_Integer result = 0;
+
+        if (pcallCardDataFunction<lua_Integer>("category",data,&result,&lua_conv_tointeger) == 0) {
+            return (long)result;
+        }
+        else{
+            const char *errMsg = lua_tostring(state, -1);
+            if (errMsg != nullptr) {
+                throw std::runtime_error("An error occurred in Lua call to get category (" + std::string(errMsg) + ")");
+            }
+            else{
+                throw std::runtime_error("An error occurred in Lua call to get category.");
+            }
+        }
+    }
+
     std::string LuaCardData::name(const domain::MSEDataNode &data) {
         std::string result;
 
@@ -185,6 +236,23 @@ namespace service{
             }
             else{
                 throw std::runtime_error("An error occurred in Lua call to get name.");
+            }
+        }
+    }
+
+    std::string LuaCardData::desc(const domain::MSEDataNode &data) {
+        std::string result;
+
+        if (pcallCardDataFunction<std::string>("desc",data,&result, &lua_conv_toStdString) == 0) {
+            return result;
+        }
+        else{
+            const char *errMsg = lua_tostring(state, -1);
+            if (errMsg != nullptr) {
+                throw std::runtime_error("An error occurred in Lua call to get desc (" + std::string(errMsg) + ")");
+            }
+            else{
+                throw std::runtime_error("An error occurred in Lua call to get desc.");
             }
         }
     }

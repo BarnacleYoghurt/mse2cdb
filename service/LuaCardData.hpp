@@ -73,12 +73,24 @@ namespace service {
          * @return The level returned by the function in the script; 0 if that value is negative or not a number.
          */
         unsigned long level(const domain::MSEDataNode &data);
-
-        unsigned int race();
-
-        unsigned int attribute();
-
-        long category();
+        /**
+         * @brief Get race field using the corresponding function of the loaded template script.
+         * @param data The MSEDataNode from which race should be read.
+         * @return The race returned by the function in the script; 0 if that value is negative or not a number.
+         */
+        unsigned int race(const domain::MSEDataNode &data);
+        /**
+         * @brief Get attribute field using the corresponding function of the loaded template script.
+         * @param data The MSEDataNode from which attribute should be read.
+         * @return The attribute returned by the function in the script; 0 if that value is negative or not a number.
+         */
+        unsigned int attribute(const domain::MSEDataNode &data);
+        /**
+         * @brief Get category field using the corresponding function of the loaded template script.
+         * @param data The MSEDataNode from which category should be read.
+         * @return The category returned by the function in the script; 0 if that value is not a number.
+         */
+        long category(const domain::MSEDataNode &data);
 
         /**
          * @brief Get name field using the corresponding function of the loaded template script.
@@ -86,10 +98,18 @@ namespace service {
          * @return The name returned by the function in the script.
          */
         std::string name(const domain::MSEDataNode &data);
-
-        std::string desc();
-
-        std::array<std::string, 16> str();
+        /**
+         * @brief Get desc field using the corresponding function of the loaded template script.
+         * @param data The MSEDataNode from which desc should be read.
+         * @return The desc returned by the function in the script.
+         */
+        std::string desc(const domain::MSEDataNode &data);
+        /**
+         * @brief Get str field using the corresponding function of the loaded template script.
+         * @param data The MSEDataNode from which str should be read.
+         * @return The str returned by the function in the script.
+         */
+        std::array<std::string, 16> str(const domain::MSEDataNode &data);
 
         template<typename T>
         int pcallCardDataFunction(const char *functionName, const domain::MSEDataNode &data, T *outVar, T (*converter)(lua_State*, int)){
