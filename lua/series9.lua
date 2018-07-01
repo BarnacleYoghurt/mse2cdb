@@ -72,14 +72,14 @@ function CardData.def(data)
 	return data:GetChildValue("defense")
 end
 function CardData.level(data)
-	local result = data:GetValue("level"):gsub("[^\\*]", ""):len()
+	local result = data:GetChildValue("level"):gsub("[^\\*]", ""):len()
 	
-	local isPendulum = (bit.band(cd.type(data), TYPE_PENDULUM) > 0)
-	if isPendulum then
-		local lscale = data:GetValue("blue scale")
-		local rscale = data:GetValue("right scale")
-		result = aux.PendulumLevel(result,lscale,rscale)
-	end
+	--local isPendulum = (bit.band(cd.type(data), TYPE_PENDULUM) > 0)
+	--if isPendulum then
+	--	local lscale = data:GetChildValue("blue scale")
+	--	local rscale = data:GetChildValue("right scale")
+	--	result = aux.PendulumLevel(result,lscale,rscale)
+	--end
 	return result
 end
 function CardData.race(data)

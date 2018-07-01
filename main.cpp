@@ -78,6 +78,7 @@ int main(int argc, char **argv) {
             std::cout << luaCardData.atk(testNode) << std::endl;
             std::cout << luaCardData.def(testNode) << std::endl;
             std::cout << luaCardData.name(testNode) << std::endl;
+            std::cout << luaCardData.level(testNode) << std::endl;
         }
         catch (std::exception &e){
             std::cerr << e.what() << std::endl;

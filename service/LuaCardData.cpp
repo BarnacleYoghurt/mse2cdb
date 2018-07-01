@@ -154,6 +154,23 @@ namespace service{
         }
     }
 
+    unsigned long LuaCardData::level(const domain::MSEDataNode &data) {
+        lua_Integer result = 0;
+
+        if (pcallCardDataFunction<lua_Integer>("level",data,&result,&lua_tointeger) == 0) {
+            return result>=0?(unsigned long)result:0;
+        }
+        else{
+            const char *errMsg = lua_tostring(state, -1);
+            if (errMsg != nullptr) {
+                throw std::runtime_error("An error occurred in Lua call to get level (" + std::string(errMsg) + ")");
+            }
+            else{
+                throw std::runtime_error("An error occurred in Lua call to get level.");
+            }
+        }
+    }
+
     std::string LuaCardData::name(const domain::MSEDataNode &data) {
         std::string result;
 

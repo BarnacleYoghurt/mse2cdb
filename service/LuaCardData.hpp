@@ -67,8 +67,12 @@ namespace service {
          * @return The def returned by the function in the script; 0 if that value is not a number.
          */
         int def(const domain::MSEDataNode &data);
-
-        unsigned long level();
+        /**
+         * @brief Get level field using the corresponding function of the loaded template script.
+         * @param data The MSEDataNode from which level should be read.
+         * @return The level returned by the function in the script; 0 if that value is negative or not a number.
+         */
+        unsigned long level(const domain::MSEDataNode &data);
 
         unsigned int race();
 
