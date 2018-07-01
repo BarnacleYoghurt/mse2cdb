@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
 
         //Call lua script
         try {
-            service::LuaCardData luaCardData("../lua/" + argTemplate + ".lua");
+            service::LuaCardData luaCardData(argTemplate, argLanguage);
             std::cout << luaCardData.id(root->getChildNode("card")) << std::endl;
             std::cout << luaCardData.ot(root->getChildNode("card")) << std::endl;
             std::cout << luaCardData.alias(root->getChildNode("card")) << std::endl;

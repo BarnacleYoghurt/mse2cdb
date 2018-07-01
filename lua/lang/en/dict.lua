@@ -1,4 +1,4 @@
-local races = {
+races = {
 	['Warrior'] = RACE_WARRIOR,
 	['Spellcaster'] = RACE_SPELLCASTER,
 	['Fairy'] = RACE_FAIRY,
@@ -24,7 +24,7 @@ local races = {
 	['Divine-beast'] = RACE_DEVINE,
 	['Creator God '] = RACE_CREATORGOD
 }
-local subtypes = {
+subtypes = {
 	['Effect'] = TYPE_EFFECT,
 	['Fusion'] = TYPE_FUSION,
 	['Ritual'] = TYPE_RITUAL,
@@ -44,7 +44,7 @@ local subtypes = {
 	['&'] = TYPE_FIELD,
 	['!'] = TYPE_COUNTER
 }
-local attributes = {
+attributes = {
 	['earth'] = ATTRIBUTE_EARTH,
 	['water'] = ATTRIBUTE_WATER,
 	['fire'] = ATTRIBUTE_FIRE,
@@ -53,4 +53,4 @@ local attributes = {
 	['dark'] = ATTRIBUTE_DARK,
 	['divine'] = ATTRIBUTE_DEVINE
 }
-local treatedAs = "\(This card is always treated as a(n)? \"%s\" card\)"
+treatedAs = "\(This card is always treated as a(n)? \"%s\" card\)"

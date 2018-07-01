@@ -16,10 +16,10 @@ namespace service {
     public:
         /**
          * @brief Initialize Lua state and load the specified script.
-         * @param templatePath The Lua script to load.
+         * @param templateName The Lua script to load.
          * @throw runtime_error if the state cannot be created or the script cannot be loaded.
          */
-        LuaCardData(const std::string &templatePath);
+        LuaCardData(const std::string &templateName, const std::string &language);
         /**
          * @brief Automatically close the Lua state when the object is destroyed.
          */

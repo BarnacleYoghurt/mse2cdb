@@ -10,7 +10,7 @@ find_package(LibZip REQUIRED)
 include_directories(./)
 
 set(MAIN_FILES main.cpp)
-set(IO_FILES io/CDBAccess.cpp io/CDBAccess.hpp io/MSEReader.cpp io/MSEReader.hpp)
+set(IO_FILES io/CDBAccess.cpp io/CDBAccess.hpp io/MSEReader.cpp io/MSEReader.hpp io/LuaScriptFinder.cpp io/LuaScriptFinder.hpp)
 set(DOMAIN_FILES domain/MSEDataNode.cpp domain/MSEDataNode.hpp domain/CDBCard.hpp)
 set(SERVICE_FILES service/LuaCardData.cpp service/LuaCardData.hpp service/LuaMSENodeData.cpp service/LuaMSENodeData.hpp service/LuaConverters.hpp service/LuaConverters.cpp)
 

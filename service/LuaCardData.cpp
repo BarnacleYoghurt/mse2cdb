@@ -1,17 +1,30 @@
 #include <stdexcept>
+#include <io/LuaScriptFinder.hpp>
 #include "LuaCardData.hpp"
 #include "LuaMSENodeData.hpp"
 #include "LuaConverters.hpp"
 
 namespace service{
-    LuaCardData::LuaCardData(const std::string &templatePath) {
+    LuaCardData::LuaCardData(const std::string &templateName, const std::string &language) {
         state = luaL_newstate();
         if (state == nullptr){
             throw std::runtime_error("Could not create initial Lua state.");
         }
         luaL_openlibs(state);
-        if (luaL_dofile(state, templatePath.c_str()) == 1){
-            throw std::runtime_error("Could not load Lua script for selected template (" + templatePath + ")");
+        if (luaL_dofile(state, io::luaScriptFinder::getConstantsPath().c_str()) == 1){
+            throw std::runtime_error("Could not load Lua constants (" + io::luaScriptFinder::getConstantsPath() + ").");
+        }
+        if (luaL_dofile(state, io::luaScriptFinder::getUtilityPath().c_str()) == 1){
+            throw std::runtime_error("Could not load Lua utility functions (" + io::luaScriptFinder::getUtilityPath() + ").");
+        }
+        if (luaL_dofile(state, io::luaScriptFinder::getTemplatePath(templateName).c_str()) == 1){
+            throw std::runtime_error("Could not load Lua script for selected template (" + io::luaScriptFinder::getTemplatePath(templateName) + ")");
+        }
+        if (luaL_dofile(state, io::luaScriptFinder::getDictPath(language).c_str()) == 1){
+            throw std::runtime_error("Could not load dictionary for selected language (" + io::luaScriptFinder::getDictPath(language) + ")");
+        }
+        if (luaL_dofile(state, io::luaScriptFinder::getArchetypesPath(language).c_str()) == 1){
+            throw std::runtime_error("Could not load archetype list for selected language (" + io::luaScriptFinder::getArchetypesPath(language) + ")");
         }
         createNodeDataMetatable();
     }
