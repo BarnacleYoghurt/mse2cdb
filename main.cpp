@@ -71,6 +71,8 @@ int main(int argc, char **argv) {
             service::LuaCardData luaCardData("../lua/" + argTemplate + ".lua");
             std::cout << luaCardData.id(root->getChildNode("card")) << std::endl;
             std::cout << luaCardData.ot(root->getChildNode("card")) << std::endl;
+            std::cout << luaCardData.alias(root->getChildNode("card")) << std::endl;
+            std::cout << luaCardData.setcode(root->getChildNode("card")) << std::endl;
             std::cout << luaCardData.name(root->getChildNode("card")) << std::endl;
         }
         catch (std::exception &e){

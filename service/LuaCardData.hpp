@@ -37,10 +37,18 @@ namespace service {
          * @return The id returned by the function in the script; 0 if that value is not a number.
          */
         int ot(const domain::MSEDataNode &data);
-
-        unsigned int alias();
-
-        unsigned long setcode();
+        /**
+         * @brief Get alias field using the corresponding function of the loaded script.
+         * @param data The MSEDataNode from which alias should be read.
+         * @return The alias returned by the function in the script; 0 if that value is negative or not a number.
+         */
+        unsigned int alias(const domain::MSEDataNode &data);
+        /**
+         * @brief Get setcode field using the corresponding function of the loaded script.
+         * @param data The MSEDataNode from which setcode should be read.
+         * @return The setcode returned by the function in the script; 0 if that value is negative or not a number.
+         */
+        unsigned long setcode(const domain::MSEDataNode &data);
 
         unsigned int type();
 

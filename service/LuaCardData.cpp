@@ -56,6 +56,40 @@ namespace service{
         }
     }
 
+    unsigned int LuaCardData::alias(const domain::MSEDataNode &data) {
+        lua_Integer result = 0;
+
+        if (pcallCardDataFunction<lua_Integer>("alias",data,&result,&lua_tointeger) == 0) {
+            return result>=0?(unsigned int)result:0;
+        }
+        else{
+            const char *errMsg = lua_tostring(state, -1);
+            if (errMsg != nullptr) {
+                throw std::runtime_error("An error occurred in Lua call to get alias (" + std::string(errMsg) + ")");
+            }
+            else{
+                throw std::runtime_error("An error occurred in Lua call to get alias.");
+            }
+        }
+    }
+
+    unsigned long LuaCardData::setcode(const domain::MSEDataNode &data) {
+        lua_Integer result = 0;
+
+        if (pcallCardDataFunction<lua_Integer>("setcode",data,&result,&lua_tointeger) == 0) {
+            return result>=0?(unsigned long)result:0;
+        }
+        else{
+            const char *errMsg = lua_tostring(state, -1);
+            if (errMsg != nullptr) {
+                throw std::runtime_error("An error occurred in Lua call to get setcode (" + std::string(errMsg) + ")");
+            }
+            else{
+                throw std::runtime_error("An error occurred in Lua call to get setcode.");
+            }
+        }
+    }
+
     std::string LuaCardData::name(const domain::MSEDataNode &data) {
         std::string result;
 
@@ -79,5 +113,7 @@ namespace service{
         lua_setfield(state, -2, "__index");
         lua_pushcfunction(state, mseNodeData::getChildValue);
         lua_setfield(state, -2, "GetChildValue");
+        lua_pushcfunction(state, mseNodeData::getChildFullContent);
+        lua_setfield(state, -2, "GetChildFullContent");
     }
 }
