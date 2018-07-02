@@ -257,6 +257,27 @@ namespace service{
         }
     }
 
+    std::vector<std::string> LuaCardData::str(const domain::MSEDataNode &data) {
+        std::vector<std::string> result;
+
+        if (pcallCardDataFunction<std::vector<std::string>>("str",data,&result, &lua_conv_tostrlist) == 0) {
+            while (result.size() < 16){
+                result.emplace_back("");
+            }
+
+            return result;
+        }
+        else{
+            const char *errMsg = lua_tostring(state, -1);
+            if (errMsg != nullptr) {
+                throw std::runtime_error("An error occurred in Lua call to get str (" + std::string(errMsg) + ")");
+            }
+            else{
+                throw std::runtime_error("An error occurred in Lua call to get str.");
+            }
+        }
+    }
+
     void LuaCardData::createNodeDataMetatable() {
         luaL_newmetatable(state, "NodeData");
         lua_pushvalue(state, -1);

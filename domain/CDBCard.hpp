@@ -2,6 +2,7 @@
 #define MSE2CDB_CDBCARD_HPP
 
 #include <string>
+#include <vector>
 
 namespace domain {
     struct CDBCard {
@@ -22,7 +23,7 @@ namespace domain {
         //texts table
         std::string name;
         std::string desc;
-        std::string str[16];
+        std::vector<std::string> str;
 
     };
 }

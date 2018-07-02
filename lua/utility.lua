@@ -10,3 +10,10 @@ end
 function Auxiliary.SymEscape(text)
 	return text:gsub("<.+>(.*)</.+>", "%1")
 end
+function Auxiliary.ToLines(text)
+	lines = {}
+	for l in text:gmatch("[^\r\n]+") do
+		table.insert(lines, l)
+	end
+	return lines
+end

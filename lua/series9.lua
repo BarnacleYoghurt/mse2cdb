@@ -101,12 +101,12 @@ function CardData.desc(data)
 	return data:GetChildFullContent("rule text")
 end
 function CardData.str(data)
-	local notes = aux.GetLines(data:GetChildFullContent("notes"))
+	local notes = aux.ToLines(data:GetChildFullContent("notes"))
 	local strs = {}
-	local strIndex = 1
-	for note in notes do
+
+	for k,note in pairs(notes) do
 		if note:sub(1,2) == "{{" and note:sub(-2) == "}}" then
-			strs["str"..strIndex] = note:gsub("{{(.*)}}", "%1")
+			table.insert(strs, note:gsub("{{(.*)}}", "%1"))
 		end
 	end
 	return strs

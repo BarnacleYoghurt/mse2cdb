@@ -83,6 +83,7 @@ int main(int argc, char **argv) {
             std::cout << luaCardData.category(testNode) << std::endl;
             std::cout << luaCardData.name(testNode) << std::endl;
             std::cout << luaCardData.desc(testNode) << std::endl;
+            std::cout << luaCardData.str(testNode).front() << std::endl;
         }
         catch (std::exception &e){
             std::cerr << e.what() << std::endl;
@@ -115,7 +116,7 @@ int main(int argc, char **argv) {
             card.name = "Test2";
             card.desc = "Tests.";
             for (int i = 0; i<16;i++){
-                card.str[i] = std::to_string(i+1);
+                card.str.emplace_back(std::to_string(i+1));
             }
             cdbAccess.save(card);
         }

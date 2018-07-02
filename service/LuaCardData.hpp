@@ -4,6 +4,7 @@
 
 #include <string>
 #include <domain/MSEDataNode.hpp>
+#include <vector>
 
 #include "lua5.3/lua.h"
 #include "lua5.3/lauxlib.h"
@@ -109,7 +110,7 @@ namespace service {
          * @param data The MSEDataNode from which str should be read.
          * @return The str returned by the function in the script.
          */
-        std::array<std::string, 16> str(const domain::MSEDataNode &data);
+        std::vector<std::string> str(const domain::MSEDataNode &data);
 
         template<typename T>
         int pcallCardDataFunction(const char *functionName, const domain::MSEDataNode &data, T *outVar, T (*converter)(lua_State*, int)){
