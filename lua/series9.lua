@@ -106,7 +106,8 @@ function CardData.str(data)
 
 	for k,note in pairs(notes) do
 		if note:sub(1,2) == "{{" and note:sub(-2) == "}}" then
-			table.insert(strs, note:gsub("{{(.*)}}", "%1"))
+			local content = note:gsub("{{(.*)}}", "%1")
+			table.insert(strs, content)
 		end
 	end
 	return strs

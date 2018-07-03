@@ -130,6 +130,7 @@ int main(int argc, char **argv) {
 
         std::cout << "Behold! The sacred tree which I have grown from your input!" << std::endl << std::endl;
         std::cout << root->toString() << std::endl;
+        std::cout << root->getChildNode("card").toString() << std::endl;
 
     }
     
@@ -180,6 +181,7 @@ std::shared_ptr<domain::MSEDataNode> buildMseTree(const std::string &setData) {
             key.erase(find_if(key.rbegin(), key.rend(), [](int c){ return !isspace(c); }).base(), key.end());
 
             std::shared_ptr<domain::MSEDataNode> mseNode = std::make_shared<domain::MSEDataNode>();
+            mseNode->setOriginalLine(mseLine);
             mseNode->setValue(value);
             parents[childIndent]->addChild(key, mseNode);
             parents[childIndent+1] = mseNode;
