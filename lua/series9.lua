@@ -62,7 +62,9 @@ function CardData.type(data)
 				result = result + TYPE_NORMAL
 			end
 		else
-			result = result + subtypes[level:sub(-1)]
+			if subtypes[level:sub(-1)] then
+				result = result + subtypes[level:sub(-1)]
+			end
 		end
 	end
 	return result
@@ -79,9 +81,16 @@ function CardData.level(data)
 	local isPendulum = (bit.band(cd.type(data), TYPE_PENDULUM) > 0)
 	if isPendulum then
 		local lscale = data:GetChildValue("blue scale")
+		if lscale == "" then
+			lscale = "0"
+		end
 		local rscale = data:GetChildValue("right scale")
+		if rscale == "" then
+			rscale = "0"
+		end
+
 		result = aux.PendulumLevel(result,lscale,rscale)
-	end
+    end
 	return result
 end
 function CardData.race(data)

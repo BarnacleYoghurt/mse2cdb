@@ -100,6 +100,37 @@ int main(int argc, char **argv) {
             std::cerr << e.what() << std::endl;
         }
 
+        std::vector<domain::MSEDataNode> cards = root->getChildrenWithKey("card");
+
+        try {
+            service::LuaCardData luaCardData(argTemplate, argLanguage);
+
+            for (const auto &mseCard : cards) {
+                domain::CDBCard cdbCard;
+                cdbCard.id = luaCardData.id(mseCard);
+                cdbCard.ot = luaCardData.ot(mseCard);
+                cdbCard.alias = luaCardData.alias(mseCard);
+                cdbCard.setcode = luaCardData.setcode(mseCard);
+                cdbCard.type = luaCardData.type(mseCard);
+                cdbCard.atk = luaCardData.atk(mseCard);
+                cdbCard.def = luaCardData.def(mseCard);
+                cdbCard.level = luaCardData.level(mseCard);
+                cdbCard.race = luaCardData.race(mseCard);
+                cdbCard.attribute = luaCardData.attribute(mseCard);
+                cdbCard.category = luaCardData.category(mseCard);
+                cdbCard.name = luaCardData.name(mseCard);
+                cdbCard.desc = luaCardData.desc(mseCard);
+                cdbCard.str = luaCardData.str(mseCard);
+
+                std::cout << "Current card: " << cdbCard.id << " (" << cdbCard.name << ")" << std::endl;
+
+                cdbAccess.save(cdbCard);
+            }
+        }
+        catch (std::exception &e){
+            std::cerr << e.what() << std::endl;
+        }
+
         try {
             domain::CDBCard card;
             card.id = 8399;
@@ -128,9 +159,9 @@ int main(int argc, char **argv) {
                   << " to import " << msePath << " into " << cdbPath << ", which currently contains " << count << " cards." << std::endl;
 
 
-        std::cout << "Behold! The sacred tree which I have grown from your input!" << std::endl << std::endl;
-        std::cout << root->toString() << std::endl;
-        std::cout << root->getChildrenWithKey("card").front().toString() << std::endl;
+        //std::cout << "Behold! The sacred tree which I have grown from your input!" << std::endl << std::endl;
+        //std::cout << root->toString() << std::endl;
+        //std::cout << root->getChildrenWithKey("card").front().toString() << std::endl;
 
     }
     
