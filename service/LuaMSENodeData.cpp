@@ -12,7 +12,8 @@ namespace service{
             auto node = (domain::MSEDataNode*)lua_touserdata(state, 1);
             const char *key = lua_tostring(state, 2);
             if (key != nullptr) {
-                childNode = node->getChildNode(key);
+                auto allChildren = node->getChildrenWithKey(key);
+                childNode = allChildren.empty()?domain::MSEDataNode():allChildren.front();
             }
 
             lua_pushlightuserdata(state, &childNode);
@@ -24,7 +25,8 @@ namespace service{
             auto node = (domain::MSEDataNode*)lua_touserdata(state, 1);
             const char *key = lua_tostring(state, 2);
             if (key != nullptr) {
-                lua_pushstring(state, node->getChildValue(key).c_str());
+                auto allChildren = node->getChildrenWithKey(key);
+                lua_pushstring(state, allChildren.empty()?"":allChildren.front().getValue().c_str());
             } else {
                 lua_pushstring(state, "");
             }
@@ -35,7 +37,8 @@ namespace service{
             auto node = (domain::MSEDataNode*)lua_touserdata(state, 1);
             const char *key = lua_tostring(state, 2);
             if (key != nullptr) {
-                lua_pushstring(state, node->getChildNode(key).toString().c_str());
+                auto allChildren = node->getChildrenWithKey(key);
+                lua_pushstring(state, allChildren.empty()?"":allChildren.front().toString().c_str());
             } else {
                 lua_pushstring(state, "");
             }

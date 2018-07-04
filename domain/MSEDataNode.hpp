@@ -14,8 +14,7 @@ namespace domain {
         void addChild(std::string key, std::shared_ptr<MSEDataNode> node);
         std::string getValue() const;
         std::string getOriginalLine() const;
-        std::string getChildValue(std::string key) const;
-        MSEDataNode getChildNode(std::string key) const;
+        std::vector<MSEDataNode> getChildrenWithKey(std::string key) const;
         std::vector<std::string> getLines() const;
         std::string toString() const;
     private:

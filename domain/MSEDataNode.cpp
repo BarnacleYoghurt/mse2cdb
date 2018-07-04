@@ -25,13 +25,16 @@ namespace domain {
         return originalLine;
     }
 
-    MSEDataNode MSEDataNode::getChildNode(std::string key) const {
-        auto it = children.find(key);
-        if (it != children.end() && it->second != nullptr) {
-            return *(it->second);
-        } else {
-            return MSEDataNode();
+    std::vector<MSEDataNode> MSEDataNode::getChildrenWithKey(std::string key) const {
+        std::vector<MSEDataNode> childrenWithKey;
+
+        auto bounds = children.equal_range(key);
+        for (auto it = bounds.first; it!=bounds.second; it++){
+            if (it->second != nullptr) {
+                childrenWithKey.emplace_back(*(it->second));
+            }
         }
+        return childrenWithKey;
     }
 
     std::vector<std::string> MSEDataNode::getLines() const {
@@ -54,10 +57,6 @@ namespace domain {
         }
 
         return lines;
-    }
-
-    std::string MSEDataNode::getChildValue(std::string key) const {
-        return getChildNode(key).getValue();
     }
 
     std::string MSEDataNode::toString() const{

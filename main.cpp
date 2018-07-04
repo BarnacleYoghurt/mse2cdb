@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
         //Call lua script
         try {
             service::LuaCardData luaCardData(argTemplate, argLanguage);
-            domain::MSEDataNode testNode = root->getChildNode("card");
+            domain::MSEDataNode testNode = root->getChildrenWithKey("card").front();
             std::cout << luaCardData.id(testNode) << std::endl;
             std::cout << luaCardData.ot(testNode) << std::endl;
             std::cout << luaCardData.alias(testNode) << std::endl;
@@ -130,7 +130,7 @@ int main(int argc, char **argv) {
 
         std::cout << "Behold! The sacred tree which I have grown from your input!" << std::endl << std::endl;
         std::cout << root->toString() << std::endl;
-        std::cout << root->getChildNode("card").toString() << std::endl;
+        std::cout << root->getChildrenWithKey("card").front().toString() << std::endl;
 
     }
     
