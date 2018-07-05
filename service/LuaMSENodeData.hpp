@@ -28,6 +28,7 @@ namespace service {
         /**
          * @brief Used by Lua to get the full original string content of the first child note with a certain key from an MSEDataNode.
          * @details Called from lua with <node>:GetChildFullContent(<key>), where node is an MSEDataNode object and key is a string.
+         * Returns the value of the node if it has one, or the source text its children were generated from otherwise.
          * Lua return value is a string (an empty one if the key wasn't found).
          * @param state The lua state calling the function.
          * @return The number of values returned to Lua (1).

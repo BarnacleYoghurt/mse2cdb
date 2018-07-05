@@ -1,28 +1,94 @@
 #include "MSEDataNode.hpp"
 #include <boost/algorithm/string.hpp>
+#include <sstream>
 
 namespace domain {
-    MSEDataNode::MSEDataNode() {
+    MSEDataNode::MSEDataNode(std::string sourceText) : sourceText(sourceText) {
+        std::stringstream ss(sourceText);
+        std::string line;
+
+        int baseIndent = -1;
+        std::string currKey;
+        std::string currValue;
+        std::string currSourceText;
+
+        while (std::getline(ss,line)){
+            if (baseIndent < 0){
+                baseIndent = 0;
+                for (char &c : line){
+                    if (c != '\t'){
+                        break;
+                    }
+                    baseIndent++;
+                }
+            }
+            int currIndent = 0;
+            for (char &c : line){
+                if (c != '\t'){
+                    break;
+                }
+                currIndent++;
+            }
+
+            if (currIndent < baseIndent){
+                baseIndent = currIndent;
+            }
+
+            if (currIndent == baseIndent){
+                if (!(currKey.empty() && currValue.empty() && currSourceText.empty())){
+                    //Create and insert pending child
+                    std::shared_ptr<MSEDataNode> child = std::make_shared<MSEDataNode>(currSourceText);
+                    child->setValue(currValue);
+                    this->addChild(currKey, child);
+
+                    //Clear values to prepare for next child
+                    currKey.clear();
+                    currValue.clear();
+                    currSourceText.clear();
+                }
+                //Read values for next child
+                size_t sepPos = line.find(':');
+                if (sepPos != std::string::npos){
+                    currKey = line.substr(0,sepPos);
+                    currValue = line.substr(sepPos + 1);
+                }
+                else{
+                    currValue = line;
+                }
+                currKey.erase(currKey.begin(), find_if(currKey.begin(), currKey.end(), [](int c){ return !isspace(c); }));
+                currValue.erase(currValue.begin(), find_if(currValue.begin(), currValue.end(), [](int c){ return !isspace(c); }));
+            }
+            else{
+                if (!currSourceText.empty()){
+                    currSourceText += "\n";
+                }
+                currSourceText += line.erase(0, (unsigned long)baseIndent+1);
+            }
+        }
+
+        if (!(currKey.empty() && currValue.empty() && currSourceText.empty())){
+            //Create and insert pending child
+            std::shared_ptr<MSEDataNode> child = std::make_shared<MSEDataNode>(currSourceText);
+            child->setValue(currValue);
+            this->addChild(currKey, child);
+        }
     }
 
     void MSEDataNode::setValue(std::string value) {
         this->value = value;
     }
 
-    void MSEDataNode::setOriginalLine(std::string originalLine) {
-        this->originalLine = originalLine;
-    }
-
     void MSEDataNode::addChild(std::string key, std::shared_ptr<MSEDataNode> node) {
         this->children.insert(std::make_pair(key, node));
+        this->sourceText += node->getSourceText();
     }
 
     std::string MSEDataNode::getValue() const {
         return value;
     }
 
-    std::string MSEDataNode::getOriginalLine() const {
-        return originalLine;
+    std::string MSEDataNode::getSourceText() const {
+        return sourceText;
     }
 
     std::vector<MSEDataNode> MSEDataNode::getChildrenWithKey(std::string key) const {
@@ -35,38 +101,5 @@ namespace domain {
             }
         }
         return childrenWithKey;
-    }
-
-    std::vector<std::string> MSEDataNode::getLines() const {
-        std::vector<std::string> lines;
-        if (!this->getValue().empty()){
-            lines.emplace_back(this->getValue());
-        }
-        for (auto &child : children){
-            std::string childLine = child.second->getOriginalLine();
-            childLine.erase(childLine.begin(), find_if(childLine.begin(), childLine.end(), [](int c){ return !isspace(c); }));
-            lines.emplace_back(childLine);
-            std::vector<std::string> cLines = child.second->getLines();
-            if (!child.second->getValue().empty()){
-                cLines.erase(cLines.begin());
-            }
-            for (auto &cLine : cLines){
-                //TODO: Revert to exactly the original indents (assuming a situation where it's necessary is possible)
-                lines.emplace_back("\t" + cLine);
-            }
-        }
-
-        return lines;
-    }
-
-    std::string MSEDataNode::toString() const{
-        std::string result;
-
-        std::vector<std::string> lines = getLines();
-        for (auto &line : lines){
-            result += line + "\n";
-        }
-
-        return result;
     }
 }

@@ -8,19 +8,18 @@
 namespace domain {
     class MSEDataNode {
     public:
-        MSEDataNode();
+        MSEDataNode(std::string sourceText);
         void setValue(std::string value);
-        void setOriginalLine(std::string originalLine);
         void addChild(std::string key, std::shared_ptr<MSEDataNode> node);
         std::string getValue() const;
-        std::string getOriginalLine() const;
+        std::string getSourceText() const;
         std::vector<MSEDataNode> getChildrenWithKey(std::string key) const;
         std::vector<std::string> getLines() const;
         std::string toString() const;
     private:
         std::multimap<std::string, std::shared_ptr<MSEDataNode>> children;
         std::string value;
-        std::string originalLine;
+        std::string sourceText;
     };
 }
 

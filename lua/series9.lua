@@ -84,7 +84,7 @@ function CardData.level(data)
 		if lscale == "" then
 			lscale = "0"
 		end
-		local rscale = data:GetChildValue("right scale")
+		local rscale = data:GetChildValue("red scale")
 		if rscale == "" then
 			rscale = "0"
 		end

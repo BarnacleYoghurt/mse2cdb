@@ -2,6 +2,7 @@
 #include <getopt.h>
 #include <fstream>
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
 #include "io/CDBAccess.hpp"
 #include "domain/MSEDataNode.hpp"
 
@@ -15,7 +16,7 @@
 #include <service/LuaCardData.hpp>
 
 
-std::shared_ptr<domain::MSEDataNode> buildMseTree(const std::string &setData);
+std::shared_ptr<domain::MSEDataNode> buildMseTree(std::string &setData);
 
 int main(int argc, char **argv) {
     int opt = 0;
@@ -64,7 +65,9 @@ int main(int argc, char **argv) {
         catch (std::exception &e){
             std::cerr << e.what() << std::endl;
         }
-        std::shared_ptr<domain::MSEDataNode> root = buildMseTree(setData);
+
+        boost::replace_all(setData, "\r\n", "\n");
+        std::shared_ptr<domain::MSEDataNode> root = std::make_shared<domain::MSEDataNode>(setData);
 
         //Call lua script
         try {
@@ -158,64 +161,7 @@ int main(int argc, char **argv) {
         std::cout << "Oh, but I was totally called for language " << argLanguage << " and template " << argTemplate
                   << " to import " << msePath << " into " << cdbPath << ", which currently contains " << count << " cards." << std::endl;
 
-
-        //std::cout << "Behold! The sacred tree which I have grown from your input!" << std::endl << std::endl;
-        //std::cout << root->toString() << std::endl;
-        //std::cout << root->getChildrenWithKey("card").front().toString() << std::endl;
-
     }
     
     return 0;
-}
-
-std::shared_ptr<domain::MSEDataNode> buildMseTree(const std::string &setData) {
-    std::stringstream mseStream(setData);
-
-    std::string mseLine;
-    std::shared_ptr<domain::MSEDataNode> root = std::make_shared<domain::MSEDataNode>();
-    std::shared_ptr<domain::MSEDataNode> currentParent;
-    std::map<int, std::shared_ptr<domain::MSEDataNode>> parents;
-    parents[0] = root;
-    int childIndent = 0;
-
-    while (getline(mseStream, mseLine)){
-            int currentIndent = 0;
-            for (char c : mseLine){
-                if (c == '\t'){
-                    currentIndent++;
-                }
-                else{
-                    break;
-                }
-            }
-            if (currentIndent > childIndent){
-                //A sudden indent by multiple tabs only counts as one hierarchy layer
-                childIndent++;
-            }
-            else if (currentIndent < childIndent){
-                childIndent = currentIndent;
-            }
-
-            std::string key;
-            std::string value;
-            size_t sepPos = mseLine.find(':');
-            if (sepPos != std::string::npos){
-                key = mseLine.substr(0,sepPos);
-                value = mseLine.substr(sepPos + 1);
-            }
-            else{
-                value = mseLine;
-            }
-            value.erase(value.begin(), find_if(value.begin(), value.end(), [](int c){ return !isspace(c); }));
-            value.erase(find_if(value.rbegin(), value.rend(), [](int c){ return !isspace(c); }).base(), value.end());
-            key.erase(key.begin(), find_if(key.begin(), key.end(), [](int c){ return !isspace(c); }));
-            key.erase(find_if(key.rbegin(), key.rend(), [](int c){ return !isspace(c); }).base(), key.end());
-
-            std::shared_ptr<domain::MSEDataNode> mseNode = std::make_shared<domain::MSEDataNode>();
-            mseNode->setOriginalLine(mseLine);
-            mseNode->setValue(value);
-            parents[childIndent]->addChild(key, mseNode);
-            parents[childIndent+1] = mseNode;
-        }
-    return root;
 }
