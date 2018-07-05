@@ -20,9 +20,9 @@ function CardData.setcode(data)
 	local setcode = 0x0
 	local name = cd.name(data)
 	local desc = cd.desc(data)
-	
+
 	for archName,archCode in pairs(archetypes) do
-		if name:find(archName) or desc:find(string.format(treatedAs, archName)) then
+		if name:find(archName) or desc:find(treatedAsPattern(archName)) then
 			if setcode > 0 then
 				return aux.DoubleSetcode(setcode,archCode)
 			else
