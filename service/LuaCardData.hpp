@@ -112,6 +112,15 @@ namespace service {
          */
         std::vector<std::string> str(const domain::MSEDataNode &data);
 
+        /**
+         * @brief Executes a lua_pcall of any function in the CardData table and tries to convert the result to the specified datatype.
+         * @tparam T The datatype of the result expected from the lua function.
+         * @param functionName The name of the function in the CardData table that will be called.
+         * @param data The MSEDataNode supplied as the lua function's argument.
+         * @param outVar Output variable that will hold the lua function's result.
+         * @param converter Pointer to a function that reads the lua return value from the stack as the desired datatype.
+         * @return The return value of lua_pcall.
+         */
         template<typename T>
         int pcallCardDataFunction(const char *functionName, const domain::MSEDataNode &data, T *outVar, T (*converter)(lua_State*, int)){
             lua_CFunction protectedFunction = [](lua_State *state){
