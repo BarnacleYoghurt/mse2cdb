@@ -22,13 +22,6 @@ namespace io {
         ~CDBAccess();
 
         /**
-         * @brief Used for debug and test purposes.
-         * @return The number of entries in the datas table.
-         * @throw runtime_error If the SQLite statement cannot be created or executed properly.
-         */
-        int getCardCount();
-
-        /**
          * @brief Adds or updates the data of a single card.
          * @param card The card data to use for the operation.
          * @throw runtime_error If the SQLite statement cannot be created or executed properly.

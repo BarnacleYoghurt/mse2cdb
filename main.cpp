@@ -16,17 +16,19 @@
 #include <service/LuaCardData.hpp>
 
 int main(int argc, char **argv) {
+    const char *usage = "Usage: mse2cdb [-l language] [-t template] msePath cdbPath";
+
     int opt = 0;
     int indexptr = 0;
-    std::string argLanguage = "en";
-    std::string argTemplate = "series9";
+    std::string argLanguage;
+    std::string argTemplate;
     std::string msePath;
     std::string cdbPath;
 
     struct option longopts[] = {
-            {"language", required_argument, 0, 'l'},
-            {"template", required_argument, 0, 't'},
-            {0,0,0,0}
+            {"language", required_argument, nullptr, 'l'},
+            {"template", required_argument, nullptr, 't'},
+            {nullptr,0,nullptr,0}
     };
 
     while ((opt = getopt_long(argc,argv,"l:t:", longopts, &indexptr)) != -1){
@@ -48,117 +50,83 @@ int main(int argc, char **argv) {
         cdbPath = argv[optind++];
     }
 
-    std::cout << "Hello, I'm a lua-configurable MSE->CDB import tool! I haven't been programmed yet, so I'm just outputting this pointless message." << std::endl;
     if (msePath.empty() || cdbPath.empty()){
-        std::cout << "I need an MSE file and a CDB file!" << std::endl;
+        std::cerr << usage << std::endl;
+        return EXIT_FAILURE;
     }
-    else {
-        //Generate MSE tree
-        std::string setData;
-        try {
-            io::MSEReader mseReader(msePath);
-            setData = mseReader.getSetData();
-        }
-        catch (std::exception &e){
-            std::cerr << e.what() << std::endl;
-        }
 
-        boost::replace_all(setData, "\r\n", "\n");
-        domain::MSEDataNode root(setData);
+    //Generate MSE tree
+    std::string setData;
 
-        //Call lua script
-        try {
-            service::LuaCardData luaCardData(argTemplate, argLanguage);
-            domain::MSEDataNode testNode = root.getChildrenWithKey("card").front();
-            std::cout << luaCardData.id(testNode) << std::endl;
-            std::cout << luaCardData.ot(testNode) << std::endl;
-            std::cout << luaCardData.alias(testNode) << std::endl;
-            std::cout << luaCardData.setcode(testNode) << std::endl;
-            std::cout << luaCardData.type(testNode) << std::endl;
-            std::cout << luaCardData.atk(testNode) << std::endl;
-            std::cout << luaCardData.def(testNode) << std::endl;
-            std::cout << luaCardData.level(testNode) << std::endl;
-            std::cout << luaCardData.race(testNode) << std::endl;
-            std::cout << luaCardData.attribute(testNode) << std::endl;
-            std::cout << luaCardData.category(testNode) << std::endl;
-            std::cout << luaCardData.name(testNode) << std::endl;
-            std::cout << luaCardData.desc(testNode) << std::endl;
-            std::cout << luaCardData.str(testNode).front() << std::endl;
-        }
-        catch (std::exception &e){
-            std::cerr << e.what() << std::endl;
-        }
+    std::cout << "Reading data from MSE file ..." << std::endl;
+    try {
+        io::MSEReader mseReader(msePath);
+        setData = mseReader.getSetData();
+    }
+    catch (std::exception &e){
+        std::cout << "Failure!" << std::endl;
+        std::cerr << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+    boost::replace_all(setData, "\r\n", "\n");
+    domain::MSEDataNode root(setData);
+    std::cout << "Success!" << std::endl;
 
-        //Update database
+    //Update database
+    std::cout << "Opening connection to CDB file ..." << std::endl;
+    try {
         io::CDBAccess cdbAccess(cdbPath);
-        int count =  0;
-        try {
-            count = cdbAccess.getCardCount();
-        }
-        catch (const std::runtime_error& e){
-            std::cout << "Oh wow, you managed to make the test call throw an exception. I hope you're proud of yourself." << std::endl;
-            std::cerr << e.what() << std::endl;
-        }
+        std::cout << "Success!" << std::endl;
 
         std::vector<domain::MSEDataNode> cards = root.getChildrenWithKey("card");
-
         try {
+            std::cout << "Loading lua scripts ..." << std::endl;
             service::LuaCardData luaCardData(argTemplate, argLanguage);
+            std::cout << "Success!" << std::endl;
 
+            std::cout << "Converting " << cards.size() << " cards ..." << std::endl;
+            int progress = 0;
             for (const auto &mseCard : cards) {
                 domain::CDBCard cdbCard;
-                cdbCard.id = luaCardData.id(mseCard);
-                cdbCard.ot = luaCardData.ot(mseCard);
-                cdbCard.alias = luaCardData.alias(mseCard);
-                cdbCard.setcode = luaCardData.setcode(mseCard);
-                cdbCard.type = luaCardData.type(mseCard);
-                cdbCard.atk = luaCardData.atk(mseCard);
-                cdbCard.def = luaCardData.def(mseCard);
-                cdbCard.level = luaCardData.level(mseCard);
-                cdbCard.race = luaCardData.race(mseCard);
-                cdbCard.attribute = luaCardData.attribute(mseCard);
-                cdbCard.category = luaCardData.category(mseCard);
-                cdbCard.name = luaCardData.name(mseCard);
-                cdbCard.desc = luaCardData.desc(mseCard);
-                cdbCard.str = luaCardData.str(mseCard);
 
-                std::cout << "Current card: " << cdbCard.id << " (" << cdbCard.name << ")" << std::endl;
+                std::cout << "Card " << ++progress << "/" << cards.size() << ":" << std::endl;
+                try {
+                    cdbCard.id = luaCardData.id(mseCard);
+                    cdbCard.name = luaCardData.name(mseCard);
 
-                cdbAccess.save(cdbCard);
+                    std::cout << "\t" << cdbCard.id << " (" << cdbCard.name << ")" << std::endl;
+
+                    cdbCard.ot = luaCardData.ot(mseCard);
+                    cdbCard.alias = luaCardData.alias(mseCard);
+                    cdbCard.setcode = luaCardData.setcode(mseCard);
+                    cdbCard.type = luaCardData.type(mseCard);
+                    cdbCard.atk = luaCardData.atk(mseCard);
+                    cdbCard.def = luaCardData.def(mseCard);
+                    cdbCard.level = luaCardData.level(mseCard);
+                    cdbCard.race = luaCardData.race(mseCard);
+                    cdbCard.attribute = luaCardData.attribute(mseCard);
+                    cdbCard.category = luaCardData.category(mseCard);
+                    cdbCard.desc = luaCardData.desc(mseCard);
+                    cdbCard.str = luaCardData.str(mseCard);
+                    cdbAccess.save(cdbCard);
+                }
+                catch (const std::exception &e){
+                    std::cout << "Could not convert card." << std::endl;
+                    std::cerr << e.what() << std::endl;
+                }
             }
         }
-        catch (std::exception &e){
+        catch (const std::exception &e){
+            std::cout << "Failure!" << std::endl;
             std::cerr << e.what() << std::endl;
+            return EXIT_FAILURE;
         }
-
-        try {
-            domain::CDBCard card;
-            card.id = 8399;
-            card.ot = 0;
-            card.alias = 0;
-            card.setcode = 0;
-            card.type = 71;
-            card.atk = 1500;
-            card.def = 1000;
-            card.level = 4;
-            card.race = 8;
-            card.attribute = 32;
-            card.category = 0;
-            card.name = "Test2";
-            card.desc = "Tests.";
-            for (int i = 0; i<16;i++){
-                card.str.emplace_back(std::to_string(i+1));
-            }
-            cdbAccess.save(card);
-        }
-        catch (const std::runtime_error& e){
-            std::cerr << e.what() << std::endl;
-        }
-
-        std::cout << "Oh, but I was totally called for language " << argLanguage << " and template " << argTemplate
-                  << " to import " << msePath << " into " << cdbPath << ", which currently contains " << count << " cards." << std::endl;
-
     }
-    
-    return 0;
+    catch (const std::exception &e){
+        std::cout << "Failure!" << std::endl;
+        std::cerr << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
 }
