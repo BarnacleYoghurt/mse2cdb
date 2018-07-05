@@ -37,8 +37,8 @@ namespace domain {
             if (currIndent == baseIndent){
                 if (!(currKey.empty() && currValue.empty() && currSourceText.empty())){
                     //Create and insert pending child
-                    std::shared_ptr<MSEDataNode> child = std::make_shared<MSEDataNode>(currSourceText);
-                    child->setValue(currValue);
+                    MSEDataNode child(currSourceText);
+                    child.setValue(currValue);
                     this->addChild(currKey, child);
 
                     //Clear values to prepare for next child
@@ -68,8 +68,8 @@ namespace domain {
 
         if (!(currKey.empty() && currValue.empty() && currSourceText.empty())){
             //Create and insert pending child
-            std::shared_ptr<MSEDataNode> child = std::make_shared<MSEDataNode>(currSourceText);
-            child->setValue(currValue);
+            MSEDataNode child(currSourceText);
+            child.setValue(currValue);
             this->addChild(currKey, child);
         }
     }
@@ -78,9 +78,8 @@ namespace domain {
         this->value = value;
     }
 
-    void MSEDataNode::addChild(std::string key, std::shared_ptr<MSEDataNode> node) {
+    void MSEDataNode::addChild(std::string key, MSEDataNode node) {
         this->children.insert(std::make_pair(key, node));
-        this->sourceText += node->getSourceText();
     }
 
     std::string MSEDataNode::getValue() const {
@@ -96,9 +95,7 @@ namespace domain {
 
         auto bounds = children.equal_range(key);
         for (auto it = bounds.first; it!=bounds.second; it++){
-            if (it->second != nullptr) {
-                childrenWithKey.emplace_back(*(it->second));
-            }
+            childrenWithKey.emplace_back(it->second);
         }
         return childrenWithKey;
     }

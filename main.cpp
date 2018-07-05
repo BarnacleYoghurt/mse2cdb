@@ -15,9 +15,6 @@
 #include <io/MSEReader.hpp>
 #include <service/LuaCardData.hpp>
 
-
-std::shared_ptr<domain::MSEDataNode> buildMseTree(std::string &setData);
-
 int main(int argc, char **argv) {
     int opt = 0;
     int indexptr = 0;
@@ -67,12 +64,12 @@ int main(int argc, char **argv) {
         }
 
         boost::replace_all(setData, "\r\n", "\n");
-        std::shared_ptr<domain::MSEDataNode> root = std::make_shared<domain::MSEDataNode>(setData);
+        domain::MSEDataNode root(setData);
 
         //Call lua script
         try {
             service::LuaCardData luaCardData(argTemplate, argLanguage);
-            domain::MSEDataNode testNode = root->getChildrenWithKey("card").front();
+            domain::MSEDataNode testNode = root.getChildrenWithKey("card").front();
             std::cout << luaCardData.id(testNode) << std::endl;
             std::cout << luaCardData.ot(testNode) << std::endl;
             std::cout << luaCardData.alias(testNode) << std::endl;
@@ -103,7 +100,7 @@ int main(int argc, char **argv) {
             std::cerr << e.what() << std::endl;
         }
 
-        std::vector<domain::MSEDataNode> cards = root->getChildrenWithKey("card");
+        std::vector<domain::MSEDataNode> cards = root.getChildrenWithKey("card");
 
         try {
             service::LuaCardData luaCardData(argTemplate, argLanguage);

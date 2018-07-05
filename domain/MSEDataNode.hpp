@@ -10,14 +10,12 @@ namespace domain {
     public:
         MSEDataNode(std::string sourceText);
         void setValue(std::string value);
-        void addChild(std::string key, std::shared_ptr<MSEDataNode> node);
+        void addChild(std::string key, MSEDataNode node);
         std::string getValue() const;
         std::string getSourceText() const;
         std::vector<MSEDataNode> getChildrenWithKey(std::string key) const;
-        std::vector<std::string> getLines() const;
-        std::string toString() const;
     private:
-        std::multimap<std::string, std::shared_ptr<MSEDataNode>> children;
+        std::multimap<std::string, MSEDataNode> children;
         std::string value;
         std::string sourceText;
     };
