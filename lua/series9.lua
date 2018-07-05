@@ -23,11 +23,7 @@ function CardData.setcode(data)
 
 	for archName,archCode in pairs(archetypes) do
 		if name:find(archName) or desc:find(treatedAsPattern(archName)) then
-			if setcode > 0 then
-				return aux.DoubleSetcode(setcode,archCode)
-			else
-				setcode = archCode
-			end
+			setcode = aux.AddSetCode(setcode,archCode)
 		end
 	end
 	return setcode
