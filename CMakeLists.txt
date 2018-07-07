@@ -2,6 +2,13 @@ cmake_minimum_required(VERSION 3.7)
 project(mse2cdb)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}")
 set(CMAKE_CXX_STANDARD 17)
+#set(CMAKE_VERBOSE_MAKEFILE ON)
+
+#set(CMAKE_CXX_COMPILER /usr/bin/x86_64-w64-mingw32-gcc)
+#set(WIN_SQLITE3_LIBRARIES /usr/lib/gcc/x86_64-w64-mingw32/5.3-win32/include/c++/x86_64-w64-mingw32/sqlite3.dll)
+#set(WIN_LUA53_LIBRARIES /usr/lib/gcc/x86_64-w64-mingw32/5.3-win32/include/c++/x86_64-w64-mingw32/lua5.3/liblua53.a)
+#set(WIN_LIBZIP_LIBRARIES /usr/lib/gcc/x86_64-w64-mingw32/5.3-win32/include/c++/x86_64-w64-mingw32/libzip.dll)
+#set(WIN_STD_LIBRARIES /usr/lib/gcc/x86_64-w64-mingw32/5.3-win32/libstdc++.a)
 
 find_package(sqlite3 REQUIRED)
 find_package(Lua53 REQUIRED)
@@ -19,5 +26,7 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/lua
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/lua ${CMAKE_CURRENT_BINARY_DIR}/lua)
 
+#add_executable(mse2cdb.exe ${MAIN_FILES} ${IO_FILES} ${DOMAIN_FILES} ${SERVICE_FILES} ${CMAKE_CURRENT_BINARY_DIR}/lua)
 add_executable(mse2cdb ${MAIN_FILES} ${IO_FILES} ${DOMAIN_FILES} ${SERVICE_FILES} ${CMAKE_CURRENT_BINARY_DIR}/lua)
+#target_link_libraries(mse2cdb.exe ${WIN_STD_LIBRARIES} ${WIN_SQLITE3_LIBRARIES} ${WIN_LUA53_LIBRARIES} ${WIN_LIBZIP_LIBRARIES} -static)
 target_link_libraries(mse2cdb ${SQLITE3_LIBRARIES} ${LUA53_LIBRARIES} ${LIBZIP_LIBRARIES})

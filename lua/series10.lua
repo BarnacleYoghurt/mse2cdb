@@ -76,11 +76,11 @@ function CardData.level(data)
 	
 	local isPendulum = (bit.band(cd.type(data), TYPE_PENDULUM) > 0)
 	if isPendulum then
-		local lscale = data:GetChildValue("blue scale")
+		local lscale = data:GetChildValue("pendulum scale 1")
 		if lscale == "" then
 			lscale = "0"
 		end
-		local rscale = data:GetChildValue("red scale")
+		local rscale = data:GetChildValue("pendulum scale 2")
 		if rscale == "" then
 			rscale = "0"
 		end
@@ -107,7 +107,7 @@ function CardData.desc(data)
 	local desc = data:GetChildFullContent("rule text")
 	local pendulumDesc = data:GetChildFullContent("pendulum text")
 	local _,_,scale = string.format("%x", cd.level(data)):find("(%d-)0.*")
-
+	
 	return aux.BuildCardDescription(type, desc, pendulumDesc, scale)
 end
 function CardData.str(data)
