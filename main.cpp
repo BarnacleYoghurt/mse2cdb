@@ -72,6 +72,20 @@ int main(int argc, char **argv) {
     domain::MSEDataNode root(setData);
     std::cout << "Success!" << std::endl;
 
+    //Try to fill in missing arguments
+    if (argLanguage.empty() && !root.getChildrenWithKey("set info").empty()) {
+        domain::MSEDataNode setInfoNode = root.getChildrenWithKey("set info").front();
+        if (!setInfoNode.getChildrenWithKey("language").empty()) {
+            argLanguage = setInfoNode.getChildrenWithKey("language").front().getValue();
+            std::transform(argLanguage.begin(), argLanguage.end(), argLanguage.begin(), ::tolower);
+            std::cout << "Language guessed based on set file: " << argLanguage << std::endl;
+        }
+    }
+    if (argTemplate.empty() && !root.getChildrenWithKey("stylesheet").empty()){
+        argTemplate = root.getChildrenWithKey("stylesheet").front().getValue();
+        std::cout << "Template guessed based on set file: " << argTemplate << std::endl;
+    }
+
     //Update database
     std::cout << "Opening connection to CDB file ..." << std::endl;
     try {
@@ -111,7 +125,7 @@ int main(int argc, char **argv) {
                     cdbAccess.save(cdbCard);
                 }
                 catch (const std::exception &e){
-                    std::cout << "Could not convert card." << std::endl;
+                    std::cout << "\tCould not convert card." << std::endl;
                     std::cerr << e.what() << std::endl;
                 }
             }
