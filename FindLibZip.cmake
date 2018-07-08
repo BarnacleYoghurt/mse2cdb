@@ -19,7 +19,7 @@
 FIND_PATH(LIBZIP_INCLUDE_DIR NAMES zip.h)
 
 # Look for the library.
-FIND_LIBRARY(LIBZIP_LIBRARY NAMES zip)
+FIND_LIBRARY(LIBZIP_LIBRARY NAMES libzip.a zip)
 
 # Handle the QUIETLY and REQUIRED arguments and set LIBZIP_FOUND to TRUE if all listed variables are TRUE.
 INCLUDE(FindPackageHandleStandardArgs)
