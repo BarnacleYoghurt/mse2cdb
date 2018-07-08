@@ -17,6 +17,11 @@
 
 int main(int argc, char **argv) {
     const char *usage = "Usage: mse2cdb [-l language] [-t template] msePath cdbPath";
+    if (argc > 0){
+        std::string exePath(argv[0]);
+        exePath = exePath.substr(0, exePath.find_last_of("\\"));
+        chdir(exePath.c_str());
+    }
 
     int opt = 0;
     int indexptr = 0;
@@ -103,12 +108,12 @@ int main(int argc, char **argv) {
             for (const auto &mseCard : cards) {
                 domain::CDBCard cdbCard;
 
-                std::cout << "Card " << ++progress << "/" << cards.size() << ":" << std::endl;
+                std::cout << "\tCard " << ++progress << "/" << cards.size() << ":" << std::endl;
                 try {
                     cdbCard.id = luaCardData.id(mseCard);
                     cdbCard.name = luaCardData.name(mseCard);
 
-                    std::cout << "\t" << cdbCard.id << " (" << cdbCard.name << ")" << std::endl;
+                    std::cout << "\t\t" << cdbCard.id << " (" << cdbCard.name << ")" << std::endl;
 
                     cdbCard.ot = luaCardData.ot(mseCard);
                     cdbCard.alias = luaCardData.alias(mseCard);
@@ -125,10 +130,11 @@ int main(int argc, char **argv) {
                     cdbAccess.save(cdbCard);
                 }
                 catch (const std::exception &e){
-                    std::cout << "\tCould not convert card." << std::endl;
+                    std::cout << "\t\tCould not convert card." << std::endl;
                     std::cerr << e.what() << std::endl;
                 }
             }
+            std::cout << "Success!" << std::endl;
         }
         catch (const std::exception &e){
             std::cout << "Failure!" << std::endl;
