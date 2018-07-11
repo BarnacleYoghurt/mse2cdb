@@ -14,6 +14,8 @@
 #include <sstream>
 #include <io/MSEReader.hpp>
 #include <service/LuaCardData.hpp>
+//For cross-platform chdir
+#include <unistd.h>
 
 int main(int argc, char **argv) {
     const char *usage = "Usage: mse2cdb [-l language] [-t template] msePath cdbPath";
