@@ -34,10 +34,11 @@ function CardData.type(data)
 	if cardframe:find("token") then
 		result = TYPE_MONSTER + TYPE_NORMAL + TYPE_TOKEN
 	else
+		local cardtype = data:GetChildValue("card type")
 		local level = aux.SymEscape(data:GetChildValue("level"))
-		if level:find("Spell") then
+		if cardtype:find("spell") then
 			result = result + TYPE_SPELL
-		elseif level:find("Trap") then
+		elseif cardtype:find("trap") then
 			result = result + TYPE_TRAP
 		else
 			result = result + TYPE_MONSTER
@@ -103,12 +104,33 @@ function CardData.name(data)
 	return data:GetChildValue("name")
 end
 function CardData.desc(data)
-	local type=cd.type(data)
-	local desc = data:GetChildFullContent("rule text")
-	local pendulumDesc = data:GetChildFullContent("pendulum text")
-	local _,_,scale = string.format("%x", cd.level(data)):find("(%d-)0.*")
+	local descDict = {["<sym%-auto>%*</sym%-auto>"]="●"}
 	
-	return aux.BuildCardDescription(type, desc, pendulumDesc, scale)
+	local cardType=cd.type(data)
+	
+	local desc = aux.SymEscape(data:GetChildFullContent("rule text"),descDict)
+	
+	local fullDesc = ""
+	
+	if bit.band(cardType,TYPE_PENDULUM) == TYPE_PENDULUM then
+		local _,_,scale = string.format("%x", cd.level(data)):find("(%d-)0.*")
+		fullDesc = "Pendulum Scale = "..scale
+		local pendulumDesc = aux.SymEscape(data:GetChildFullContent("pendulum text"),descDict)
+		if pendulumDesc ~= "" then
+			fullDesc = fullDesc.."\n[ Pendulum Effect ]"
+			fullDesc = fullDesc.."\n"..pendulumDesc
+			fullDesc = fullDesc.."\n----------------------------------------"
+			if bit.band(cardType,TYPE_NORMAL) == TYPE_NORMAL then
+				fullDesc = fullDesc.."\n[ Flavor Text ]"
+			else
+				fullDesc = fullDesc.."\n[ Monster Effect ]"
+			end
+		end
+	end
+	if fullDesc ~= "" then fullDesc = fullDesc.."\n" end
+	fullDesc = fullDesc..desc
+	
+	return fullDesc
 end
 function CardData.str(data)
 	local notes = aux.ToLines(data:GetChildFullContent("notes"))

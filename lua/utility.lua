@@ -31,8 +31,12 @@ end
 function Auxiliary.PendulumLevel(level,lscale,rscale)
 	return tonumber(string.format('%x',lscale).."0"..string.format('%x',rscale).."000"..string.format("%x",level), 16)
 end
-function Auxiliary.SymEscape(text)
-	return text:gsub("<.+>(.*)</.+>", "%1")
+function Auxiliary.SymEscape(text, dict)
+	dict = dict or {}
+	for sym,trans in pairs(dict) do
+		text = text:gsub(sym,trans)
+	end
+	return text:gsub("<.->(.-)</.->", "%1")
 end
 function Auxiliary.ToLines(text)
 	lines = {}
@@ -40,25 +44,4 @@ function Auxiliary.ToLines(text)
 		table.insert(lines, l)
 	end
 	return lines
-end
-function Auxiliary.BuildCardDescription(type, ruleText, pendulumText, pendulumScale)
-	local fullDesc = ""
-
-	if bit.band(type,TYPE_PENDULUM) == TYPE_PENDULUM then
-		fullDesc = "Pendulum Scale = "..pendulumScale
-		if pendulumText ~= "" then
-			fullDesc = fullDesc.."\n[ Pendulum Effect ]"
-			fullDesc = fullDesc.."\n"..pendulumText
-			fullDesc = fullDesc.."\n----------------------------------------"
-			if bit.band(type,TYPE_NORMAL) == TYPE_NORMAL then
-				fullDesc = fullDesc.."\n[ Flavor Text ]"
-			else
-				fullDesc = fullDesc.."\n[ Monster Effect ]"
-			end
-		end
-	end
-	if fullDesc ~= "" then fullDesc = fullDesc.."\n" end
-	fullDesc = fullDesc..ruleText
-
-	return fullDesc
 end
