@@ -3,10 +3,6 @@ local bit = require "bit32"
 CardData={}
 cd=CardData
 
-function CardData.helloWorld()
-	return "Hello world";
-end
-
 function CardData.id(data)
 	return data:GetChildValue("gamecode")
 end
@@ -30,12 +26,10 @@ function CardData.setcode(data)
 end
 function CardData.type(data)
 	local result = 0x0
-	local cardframe = data:GetChildNode("extra data"):GetChildNode("yugioh-standard-extra"):GetChildValue("card frame")
-	if cardframe:find("token") then
+	local cardtype = data:GetChildValue("card type")
+	if cardtype:find("token") then
 		result = TYPE_MONSTER + TYPE_NORMAL + TYPE_TOKEN
 	else
-		local cardtype = data:GetChildValue("card type")
-		local level = aux.SymEscape(data:GetChildValue("level"))
 		if cardtype:find("spell") then
 			result = result + TYPE_SPELL
 		elseif cardtype:find("trap") then
@@ -43,7 +37,7 @@ function CardData.type(data)
 		else
 			result = result + TYPE_MONSTER
 		end
-		
+
 		if result == TYPE_MONSTER then
 			local nextType = 2
 			local hasSubtype = false
@@ -59,6 +53,7 @@ function CardData.type(data)
 				result = result + TYPE_NORMAL
 			end
 		else
+			local level = aux.SymEscape(data:GetChildValue(level))
 			if subtypes[level:sub(-1)] then
 				result = result + subtypes[level:sub(-1)]
 			end
@@ -74,7 +69,7 @@ function CardData.def(data)
 end
 function CardData.level(data)
 	local result = data:GetChildValue("level"):gsub("[^\\*]", ""):len()
-	
+
 	local isPendulum = (bit.band(cd.type(data), TYPE_PENDULUM) > 0)
 	if isPendulum then
 		local lscale = data:GetChildValue("pendulum scale 1")
@@ -87,7 +82,7 @@ function CardData.level(data)
 		end
 
 		result = aux.PendulumLevel(result,lscale,rscale)
-    end
+	end
 	return result
 end
 function CardData.race(data)
@@ -104,33 +99,12 @@ function CardData.name(data)
 	return data:GetChildValue("name")
 end
 function CardData.desc(data)
-	local descDict = {["<sym%-auto>%*</sym%-auto>"]="●"}
-	
-	local cardType=cd.type(data)
-	
-	local desc = aux.SymEscape(data:GetChildFullContent("rule text"),descDict)
-	
-	local fullDesc = ""
-	
-	if bit.band(cardType,TYPE_PENDULUM) == TYPE_PENDULUM then
-		local _,_,scale = string.format("%x", cd.level(data)):find("(%d-)0.*")
-		fullDesc = "Pendulum Scale = "..scale
-		local pendulumDesc = aux.SymEscape(data:GetChildFullContent("pendulum text"),descDict)
-		if pendulumDesc ~= "" then
-			fullDesc = fullDesc.."\n[ Pendulum Effect ]"
-			fullDesc = fullDesc.."\n"..pendulumDesc
-			fullDesc = fullDesc.."\n----------------------------------------"
-			if bit.band(cardType,TYPE_NORMAL) == TYPE_NORMAL then
-				fullDesc = fullDesc.."\n[ Flavor Text ]"
-			else
-				fullDesc = fullDesc.."\n[ Monster Effect ]"
-			end
-		end
-	end
-	if fullDesc ~= "" then fullDesc = fullDesc.."\n" end
-	fullDesc = fullDesc..desc
-	
-	return fullDesc
+	local type=cd.type(data)
+	local desc = data:GetChildFullContent("rule text")
+	local pendulumDesc = data:GetChildFullContent("pendulum text")
+	local _,_,scale = string.format("%x", cd.level(data)):find("(%d-)0.*")
+
+	return aux.BuildCardDescription(type, desc, pendulumDesc, scale)
 end
 function CardData.str(data)
 	local notes = aux.ToLines(data:GetChildFullContent("notes"))

@@ -45,3 +45,24 @@ function Auxiliary.ToLines(text)
 	end
 	return lines
 end
+function Auxiliary.BuildCardDescription(type, ruleText, pendulumText, pendulumScale)
+	local fullDesc = ""
+
+	if bit.band(type,TYPE_PENDULUM) == TYPE_PENDULUM then
+		fullDesc = "Pendulum Scale = "..pendulumScale
+		if pendulumText ~= "" then
+			fullDesc = fullDesc.."\n[ Pendulum Effect ]"
+			fullDesc = fullDesc.."\n"..pendulumText
+			fullDesc = fullDesc.."\n----------------------------------------"
+			if bit.band(type,TYPE_NORMAL) == TYPE_NORMAL then
+				fullDesc = fullDesc.."\n[ Flavor Text ]"
+			else
+				fullDesc = fullDesc.."\n[ Monster Effect ]"
+			end
+		end
+	end
+	if fullDesc ~= "" then fullDesc = fullDesc.."\n" end
+	fullDesc = fullDesc..ruleText
+
+	return fullDesc
+end

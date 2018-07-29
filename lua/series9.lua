@@ -3,10 +3,6 @@ local bit = require "bit32"
 CardData={}
 cd=CardData
 
-function CardData.helloWorld()
-	return "Hello world";
-end
-
 function CardData.id(data)
 	return data:GetChildValue("gamecode")
 end
@@ -30,19 +26,18 @@ function CardData.setcode(data)
 end
 function CardData.type(data)
 	local result = 0x0
-	local cardframe = data:GetChildNode("extra data"):GetChildNode("yugioh-standard-extra"):GetChildValue("card frame")
-	if cardframe:find("token") then
+	local cardtype = data:GetChildValue("card type")
+	if cardtype:find("token") then
 		result = TYPE_MONSTER + TYPE_NORMAL + TYPE_TOKEN
 	else
-		local level = aux.SymEscape(data:GetChildValue("level"))
-		if level:find("Spell") then
+		if cardtype:find("spell") then
 			result = result + TYPE_SPELL
-		elseif level:find("Trap") then
+		elseif cardtype:find("trap") then
 			result = result + TYPE_TRAP
 		else
 			result = result + TYPE_MONSTER
 		end
-		
+
 		if result == TYPE_MONSTER then
 			local nextType = 2
 			local hasSubtype = false
@@ -58,6 +53,7 @@ function CardData.type(data)
 				result = result + TYPE_NORMAL
 			end
 		else
+			local level = aux.SymEscape(data:GetChildValue(level))
 			if subtypes[level:sub(-1)] then
 				result = result + subtypes[level:sub(-1)]
 			end
@@ -73,7 +69,7 @@ function CardData.def(data)
 end
 function CardData.level(data)
 	local result = data:GetChildValue("level"):gsub("[^\\*]", ""):len()
-	
+
 	local isPendulum = (bit.band(cd.type(data), TYPE_PENDULUM) > 0)
 	if isPendulum then
 		local lscale = data:GetChildValue("blue scale")
@@ -86,7 +82,7 @@ function CardData.level(data)
 		end
 
 		result = aux.PendulumLevel(result,lscale,rscale)
-    end
+	end
 	return result
 end
 function CardData.race(data)
