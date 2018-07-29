@@ -14,10 +14,14 @@ function Auxiliary.AddSetCode(existing,new)
 
 		local part_type = bit.band(part,0xfff)
 		local part_subtype = bit.band(part,0xf000)
-		if part_type == new_type and bit.band(part_subtype, new_subtype) == part_subtype then
-			existing = existing - bit.lshift(part,shift)
-			existing = existing + bit.lshift(new,shift)
-			added = true
+		if part_type == new_type then 
+			if bit.band(part_subtype, new_subtype) == part_subtype then
+				existing = existing - bit.lshift(part,shift)
+				existing = existing + bit.lshift(new,shift)
+				added = true
+			elseif bit.band(part_subtype, new_subtype) == new_subtype then
+				added = true
+			end
 		end
 		shift = shift + 16
 	end
