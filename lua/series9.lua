@@ -99,9 +99,11 @@ function CardData.name(data)
 	return data:GetChildValue("name")
 end
 function CardData.desc(data)
+	local dict={["<sym%-auto>%*</sym%-auto>"]="●"}
+	
 	local type=cd.type(data)
-	local desc = data:GetChildFullContent("rule text")
-	local pendulumDesc = data:GetChildFullContent("pendulum text")
+	local desc = aux.SymEscape(data:GetChildFullContent("rule text"),dict)
+	local pendulumDesc = aux.SymEscape(data:GetChildFullContent("pendulum text"),dict)
 	local _,_,scale = string.format("%x", cd.level(data)):find("(%d-)0.*")
 
 	return aux.BuildCardDescription(type, desc, pendulumDesc, scale)
