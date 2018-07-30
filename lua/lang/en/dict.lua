@@ -22,7 +22,8 @@ races = {
 	['Reptile'] = RACE_REPTILE,
 	['Psychic'] = RACE_PSYCHO,
 	['Divine-beast'] = RACE_DEVINE,
-	['Creator God '] = RACE_CREATORGOD
+	['Creator God '] = RACE_CREATORGOD,
+	['Cyberse'] = RACE_CYBERSE
 }
 subtypes = {
 	['Effect'] = TYPE_EFFECT,
@@ -37,6 +38,7 @@ subtypes = {
 	['Toon'] = TYPE_TOON,
 	['Xyz'] = TYPE_XYZ,
 	['Pendulum'] = TYPE_PENDULUM,
+	['Link'] = TYPE_LINK,
 	['#'] = TYPE_RITUAL,
 	['$'] = TYPE_QUICKPLAY,
 	['%'] = TYPE_CONTINUOUS,

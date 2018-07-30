@@ -65,12 +65,45 @@ function CardData.atk(data)
 	return data:GetChildValue("attack")
 end
 function CardData.def(data)
-	return data:GetChildValue("defense")
+	local type=cd.type(data)
+	local isLink = (bit.band(type, TYPE_LINK) > 0)
+	
+	if isLink then
+		return data:GetChildValue("defense")
+	else
+		local directions = {
+			["DL"] = LINK_MARKER_BOTTOM_LEFT,
+			["Down"] = LINK_MARKER_BOTTOM,
+			["DR"] = LINK_MARKER_BOTTOM_RIGHT,
+			["Left"] = LINK_MARKER_LEFT,
+			["Right"] = LINK_MARKER_RIGHT,
+			["UL"] = LINK_MARKER_TOP_LEFT,
+			["Up"] = LINK_MARKER_TOP,
+			["UR"] = LINK_MARKER_TOP_RIGHT
+		}
+		local markers = 0x0
+		
+		for k,v in pairs(directions) do
+			if data:GetChildValue("Link Marker "..k)=="yes" then
+				markers = markers + v
+			end
+		end
+		
+		return markers
+	end
 end
 function CardData.level(data)
-	local result = data:GetChildValue("level"):gsub("[^\\*]", ""):len()
-
-	local isPendulum = (bit.band(cd.type(data), TYPE_PENDULUM) > 0)
+	local result = 0
+	local type=cd.type(data)
+	
+	local isLink = (bit.band(type, TYPE_LINK) > 0)
+	if isLink then
+		result = data:GetChildValue("link number")
+	else
+		result = data:GetChildValue("level"):gsub("[^\\*]", ""):len()
+	end
+	
+	local isPendulum = (bit.band(type, TYPE_PENDULUM) > 0)
 	if isPendulum then
 		local lscale = data:GetChildValue("pendulum scale 1")
 		if lscale == "" then
@@ -83,6 +116,7 @@ function CardData.level(data)
 
 		result = aux.PendulumLevel(result,lscale,rscale)
 	end
+	
 	return result
 end
 function CardData.race(data)
