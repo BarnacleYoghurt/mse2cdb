@@ -53,7 +53,7 @@ function CardData.type(data)
 				result = result + TYPE_NORMAL
 			end
 		else
-			local level = aux.SymEscape(data:GetChildValue(level))
+			local level = aux.SymEscape(data:GetChildValue("level"))
 			if subtypes[level:sub(-1)] then
 				result = result + subtypes[level:sub(-1)]
 			end

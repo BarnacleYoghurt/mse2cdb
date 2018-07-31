@@ -53,7 +53,7 @@ function CardData.type(data)
 				result = result + TYPE_NORMAL
 			end
 		else
-			local level = aux.SymEscape(data:GetChildValue(level))
+			local level = aux.SymEscape(data:GetChildValue("level"))
 			if subtypes[level:sub(-1)] then
 				result = result + subtypes[level:sub(-1)]
 			end
@@ -69,8 +69,6 @@ function CardData.def(data)
 	local isLink = (bit.band(type, TYPE_LINK) > 0)
 	
 	if isLink then
-		return data:GetChildValue("defense")
-	else
 		local directions = {
 			["DL"] = LINK_MARKER_BOTTOM_LEFT,
 			["Down"] = LINK_MARKER_BOTTOM,
@@ -90,6 +88,8 @@ function CardData.def(data)
 		end
 		
 		return markers
+	else
+		return data:GetChildValue("defense")
 	end
 end
 function CardData.level(data)
