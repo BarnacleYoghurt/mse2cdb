@@ -8,7 +8,7 @@ subtypes['quickplay'] = TYPE_QUICKPLAY
 subtypes['continuous'] = TYPE_CONTINUOUS
 subtypes['equipment'] = TYPE_EQUIP
 subtypes['field'] = TYPE_FIELD
-subtypes["counter"] = TYPE_COUNTER
+subtypes['counter'] = TYPE_COUNTER
 
 function CardData.id(data)
 	return data:GetChildValue("gamecode")
@@ -58,7 +58,14 @@ function CardData.type(data)
 			result = result + TYPE_NORMAL
 		end
 	else
-		local icon = aux.SymEscape(data:GetChildNode("extra data"):GetChildNode("yugioh-ygopro-anime"):GetChildValue("icon"))
+		--Account for possibility of only 1 line of extra data
+		local parentVal = data:GetChildNode("extra data"):GetChildValue("yugioh-ygopro-anime")
+		local icon = ""
+		if parentVal:find(": ") then
+			icon = parentVal:sub(parentVal:find(": ")+2)
+		else
+			icon = data:GetChildNode("extra data"):GetChildNode("yugioh-ygopro-anime"):GetChildValue("icon")
+		end
 		if subtypes[icon] then
 			result = result + subtypes[icon]
 		end
@@ -91,11 +98,14 @@ function CardData.name(data)
 	return data:GetChildValue("name")
 end
 function CardData.desc(data)
-	local dict={["<sym%-auto>%*</sym%-auto>"]="●"}
+	local dict={["%*"]="●", ["\n\t+"]="\n", ["^\t+"]=""}
 	
 	local notes=data:GetChildFullContent("notes")
-
-	return aux.SymEscape(notes:sub(1,notes:find("%-%-%-"),dict)
+	if notes:find("%-%-%-") then
+		return aux.SymEscape(notes:sub(1,notes:find("%-%-%-")-1),dict)
+	else
+		return aux.SymEscape(notes,dict)
+	end
 end
 function CardData.str(data)
 	local notes = aux.ToLines(data:GetChildFullContent("notes"))
