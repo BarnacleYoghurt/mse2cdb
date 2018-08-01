@@ -17,15 +17,15 @@ namespace service{
         if (luaL_dofile(state, io::luaScriptFinder::getUtilityPath().c_str()) == 1){
             throw std::runtime_error("Could not load Lua utility functions (" + io::luaScriptFinder::getUtilityPath() + ").");
         }
-        if (luaL_dofile(state, io::luaScriptFinder::getTemplatePath(templateName).c_str()) == 1){
-            throw std::runtime_error("Could not load Lua script for selected template (" + io::luaScriptFinder::getTemplatePath(templateName) + ")");
-        }
         if (luaL_dofile(state, io::luaScriptFinder::getDictPath(language).c_str()) == 1){
             const char *errMsg = lua_tostring(state, -1);
             throw std::runtime_error("Could not load dictionary for selected language (" + io::luaScriptFinder::getDictPath(language) + ")");
         }
         if (luaL_dofile(state, io::luaScriptFinder::getArchetypesPath(language).c_str()) == 1){
             throw std::runtime_error("Could not load archetype list for selected language (" + io::luaScriptFinder::getArchetypesPath(language) + ")");
+        }
+        if (luaL_dofile(state, io::luaScriptFinder::getTemplatePath(templateName).c_str()) == 1){
+            throw std::runtime_error("Could not load Lua script for selected template (" + io::luaScriptFinder::getTemplatePath(templateName) + ")");
         }
         createNodeDataMetatable();
     }
