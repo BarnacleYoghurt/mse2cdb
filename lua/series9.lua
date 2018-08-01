@@ -3,6 +3,13 @@ local bit = require "bit32"
 CardData={}
 cd=CardData
 
+subtypes['#'] = TYPE_RITUAL
+subtypes['$'] = TYPE_QUICKPLAY
+subtypes['%'] = TYPE_CONTINUOUS
+subtypes['+'] = TYPE_EQUIP
+subtypes['&'] = TYPE_FIELD
+subtypes['!'] = TYPE_COUNTER
+
 function CardData.id(data)
 	return data:GetChildValue("gamecode")
 end

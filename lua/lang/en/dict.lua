@@ -38,13 +38,7 @@ subtypes = {
 	['Toon'] = TYPE_TOON,
 	['Xyz'] = TYPE_XYZ,
 	['Pendulum'] = TYPE_PENDULUM,
-	['Link'] = TYPE_LINK,
-	['#'] = TYPE_RITUAL,
-	['$'] = TYPE_QUICKPLAY,
-	['%'] = TYPE_CONTINUOUS,
-	['+'] = TYPE_EQUIP,
-	['&'] = TYPE_FIELD,
-	['!'] = TYPE_COUNTER
+	['Link'] = TYPE_LINK
 }
 attributes = {
 	['earth'] = ATTRIBUTE_EARTH,
