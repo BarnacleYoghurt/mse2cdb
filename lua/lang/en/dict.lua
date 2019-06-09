@@ -51,5 +51,8 @@ attributes = {
 }
 
 function treatedAsPattern(archName)
-	return "%(This card is always treated as an? \""..archName.."\" card%)"
+	return "%(This card is always treated as an? \""..archName.."\" card%.%)"
+end
+function notTreatedAsPattern(archName)
+	return "%(This card is not treated as an? \""..archName.."\" card%.%)"
 end
