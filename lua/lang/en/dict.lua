@@ -47,7 +47,14 @@ attributes = {
 	['wind'] = ATTRIBUTE_WIND,
 	['light'] = ATTRIBUTE_LIGHT,
 	['dark'] = ATTRIBUTE_DARK,
-	['divine'] = ATTRIBUTE_DEVINE
+	['divine'] = ATTRIBUTE_DEVINE,
+	['EARTH'] = ATTRIBUTE_EARTH,
+	['WATER'] = ATTRIBUTE_WATER,
+	['FIRE'] = ATTRIBUTE_FIRE,
+	['WIND'] = ATTRIBUTE_WIND,
+	['LIGHT'] = ATTRIBUTE_LIGHT,
+	['DARK'] = ATTRIBUTE_DARK,
+	['DIVINE'] = ATTRIBUTE_DEVINE
 }
 
 function treatedAsPattern(archName)
@@ -56,3 +63,5 @@ end
 function notTreatedAsPattern(archName)
 	return "%(This card is not treated as an? \""..archName.."\" card%.%)"
 end
+summonAsPatternDesc = "as an? %a+ Monster %(([%a-]+)/(%u+)/Level (%d+)/ATK (%d+)/DEF (%d+)%)" --Monster stats in description
+summonAsPatternNotes = "%[%[SummonAs:%(([%a-]+)/(%u+)/Level (%d+)/ATK (%d+)/DEF (%d+)%)%]%]" --Monster stats in notes (in case description doesn't follow the format for some reason)

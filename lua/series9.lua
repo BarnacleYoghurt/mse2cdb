@@ -71,10 +71,39 @@ function CardData.type(data)
 	return result
 end
 function CardData.atk(data)
-	return data:GetChildValue("attack")
+  local atk = data:GetChildValue("attack")
+  if atk=="" then
+    local statsFound
+    local atk2
+    
+    local desc = data:GetChildFullContent("rule text").."\n"..data:GetChildFullContent("pendulum text")
+    local notes = data:GetChildFullContent("notes")
+    
+    statsFound,_,_,_,atk2,_ = aux.GetTrapMonsterStats(desc,notes)
+    
+    if statsFound then
+      atk=atk2
+    end
+  end
+	return atk
 end
 function CardData.def(data)
-	return data:GetChildValue("defense")
+  local def = data:GetChildValue("defense")
+  if def=="" then
+    local statsFound
+    local def2
+    
+    local desc = data:GetChildFullContent("rule text").."\n"..data:GetChildFullContent("pendulum text")
+    local notes = data:GetChildFullContent("notes")
+    
+    statsFound,_,_,_,_,def2 = aux.GetTrapMonsterStats(desc,notes)
+    
+    if statsFound then
+      def=def2
+    end
+  end
+  
+  return def
 end
 function CardData.level(data)
 	local result = data:GetChildValue("level"):gsub("[^\\*]", ""):len()
@@ -92,13 +121,58 @@ function CardData.level(data)
 
 		result = aux.PendulumLevel(result,lscale,rscale)
 	end
+  
+  if result==0 then
+    local statsFound
+    local lvl2
+    
+    local desc = data:GetChildFullContent("rule text").."\n"..data:GetChildFullContent("pendulum text")
+    local notes = data:GetChildFullContent("notes")
+    
+    statsFound,_,_,lvl2,_,_ = aux.GetTrapMonsterStats(desc,notes)
+    
+    if statsFound then
+      result=lvl2
+    end
+  end
+  
 	return result
 end
 function CardData.race(data)
-	return races[aux.SymEscape(data:GetChildValue("type 1"))]
+  local raceName = aux.SymEscape(data:GetChildValue("type 1"))
+  if not races[raceName] then
+    local statsFound
+    local raceName2
+    
+    local desc = data:GetChildFullContent("rule text").."\n"..data:GetChildFullContent("pendulum text")
+    local notes = data:GetChildFullContent("notes")
+    
+    statsFound,raceName2,_,_,_,_ = aux.GetTrapMonsterStats(desc,notes)
+    
+    if statsFound then
+      raceName=raceName2:gsub("-Type", "")
+    end
+  end
+  
+	return races[raceName]
 end
 function CardData.attribute(data)
-	return attributes[data:GetChildValue("attribute")]
+  local attrName = data:GetChildValue("attribute")
+  if not attributes[attrName] then
+    local statsFound
+    local attrName2
+    
+    local desc = data:GetChildFullContent("rule text").."\n"..data:GetChildFullContent("pendulum text")
+    local notes = data:GetChildFullContent("notes")
+    
+    statsFound,_,attrName2,_,_,_ = aux.GetTrapMonsterStats(desc,notes)
+    
+    if statsFound then
+      attrName=attrName2
+    end
+  end
+  
+	return attributes[attrName]
 end
 function CardData.category(data)
 	return 0

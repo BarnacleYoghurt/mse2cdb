@@ -70,3 +70,25 @@ function Auxiliary.BuildCardDescription(type, ruleText, pendulumText, pendulumSc
 
 	return fullDesc
 end
+function Auxiliary.GetTrapMonsterStats(desc, notes)
+  --return statsFound,race,attribute,level,atk,def
+  
+  print("Trying to figure out trap monster stats ...")
+  
+  if notes:find("[[SummonAs:No]]") then
+    print("Trap monster stats are disabled.")
+    return false,nil,nil,nil,nil,nil
+  end
+  
+  if notes:find(summonAsPatternNotes) then
+    print("Trap monster stats found in notes.")
+    local _,_,race,attribute,level,atk,def = notes:find(summonAsPatternNotes)
+    return true,race,attribute,level,atk,def
+  elseif desc:find(summonAsPatternDesc) then
+    print("Trap monster stats found in description.")
+    local _,_,race,attribute,level,atk,def = desc:find(summonAsPatternDesc)
+    return true,race,attribute,level,atk,def
+  else
+    return false,nil,nil,nil,nil,nil
+  end
+end
