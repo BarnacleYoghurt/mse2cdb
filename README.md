@@ -1,6 +1,9 @@
 # mse2cdb
 Tool for importing cards from Magic Set Editor files into a YGOPro cdb. Can be configured to support various languages and templates via Lua.
 
+## Download
+The currently latest builds for Linux and Windows can be found in [release v 0.1.0](https://github.com/BarnacleYoghurt/mse2cdb/releases/tag/v0.1.0). However, some of the scripts in there are outdated, so I recommend replacing the `lua` directory with the version from the repository. 
+
 ## How to Build
 Requires sqlite3, lua5.3, and libzip.
 ### On Linux
