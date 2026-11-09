@@ -18,11 +18,24 @@ option(MSE2CDB_STATIC "Link statically to produce a self-contained portable appl
 if(MSE2CDB_STATIC)
     set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
 endif()
-find_package(sqlite3 REQUIRED)
-find_package(Lua53 REQUIRED)
+find_package(SQLite3 REQUIRED)
+find_package(Lua 5.3 REQUIRED)
 find_package(LibZip REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(Threads REQUIRED)
+
+if(NOT TARGET SQLite3::SQLite3) # CMake < 4.3
+    add_library(SQLite3::SQLite3 ALIAS SQLite::SQLite3)
+endif()
+
+# FindLua does not (yet?) provide an imported target
+if(Lua_FOUND AND NOT TARGET Lua::Lua)
+    add_library(Lua::Lua INTERFACE IMPORTED)
+    set_target_properties(Lua::Lua PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${LUA_INCLUDE_DIR}"
+        INTERFACE_LINK_LIBRARIES "${LUA_LIBRARIES}"
+    )
+endif()
 
 set(MAIN_FILES main.cpp)
 set(IO_FILES io/CDBAccess.cpp io/CDBAccess.hpp io/MSEReader.cpp io/MSEReader.hpp io/LuaScriptFinder.cpp io/LuaScriptFinder.hpp)
@@ -32,15 +45,12 @@ set(SERVICE_FILES service/LuaCardData.cpp service/LuaCardData.hpp service/LuaMSE
 add_executable(mse2cdb ${MAIN_FILES} ${IO_FILES} ${DOMAIN_FILES} ${SERVICE_FILES})
 
 target_include_directories(mse2cdb PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${SQLITE3_INCLUDE_DIRS}
-        ${LUA53_INCLUDE_DIR}
-        ${LIBZIP_INCLUDE_DIR})
+        ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(mse2cdb PRIVATE
-        ${SQLITE3_LIBRARIES}
-        ${LUA53_LIBRARIES}
-        ${LIBZIP_LIBRARIES}
+        SQLite3::SQLite3
+        Lua::Lua
+        LibZip::LibZip
         ZLIB::ZLIB
         Threads::Threads)
 
