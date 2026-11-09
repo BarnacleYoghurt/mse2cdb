@@ -13,37 +13,40 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}")
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-## Windows Build
-#set(CMAKE_CXX_COMPILER /usr/bin/x86_64-w64-mingw32-gcc)
-#set(WIN_SQLITE3_LIBRARIES /usr/lib/gcc/x86_64-w64-mingw32/5.3-win32/include/c++/x86_64-w64-mingw32/sqlite3.dll)
-#set(WIN_LUA53_LIBRARIES /usr/lib/gcc/x86_64-w64-mingw32/5.3-win32/include/c++/x86_64-w64-mingw32/lua5.3/liblua53.a)
-#set(WIN_LIBZIP_LIBRARIES /usr/lib/gcc/x86_64-w64-mingw32/5.3-win32/include/c++/x86_64-w64-mingw32/libzip.dll)
-#set(WIN_PTHREAD_LIBRARIES /usr/lib/gcc/x86_64-w64-mingw32/5.3-win32/include/c++/x86_64-w64-mingw32/libpthread.dll.a)
-#set(WIN_DL_LIBRARIES /usr/lib/gcc/x86_64-w64-mingw32/5.3-win32/include/c++/x86_64-w64-mingw32/lua5.3/liblua53.a)
-#set(WIN_Z_LIBRARIES /usr/lib/gcc/x86_64-w64-mingw32/5.3-win32/include/c++/x86_64-w64-mingw32/libz.dll.a)
-#set(WIN_STD_LIBRARIES /usr/lib/gcc/x86_64-w64-mingw32/5.3-win32/libstdc++.a)
-
+set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
 find_package(sqlite3 REQUIRED)
 find_package(Lua53 REQUIRED)
 find_package(LibZip REQUIRED)
-find_library(PTHREAD_LIBRARIES NAMES libpthread.a pthread)
-find_library(DL_LIBRARIES NAMES libdl.a dl)
-find_library(Z_LIBRARIES NAMES libz.a z)
-
-include_directories(./)
+find_package(ZLIB REQUIRED)
+find_package(Threads REQUIRED)
 
 set(MAIN_FILES main.cpp)
 set(IO_FILES io/CDBAccess.cpp io/CDBAccess.hpp io/MSEReader.cpp io/MSEReader.hpp io/LuaScriptFinder.cpp io/LuaScriptFinder.hpp)
 set(DOMAIN_FILES domain/MSEDataNode.cpp domain/MSEDataNode.hpp domain/CDBCard.hpp)
 set(SERVICE_FILES service/LuaCardData.cpp service/LuaCardData.hpp service/LuaMSENodeData.cpp service/LuaMSENodeData.hpp service/LuaConverters.hpp service/LuaConverters.cpp)
 
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/lua
-        DEPENDS ${CMAKE_SOURCE_DIR}/lua
+add_executable(mse2cdb ${MAIN_FILES} ${IO_FILES} ${DOMAIN_FILES} ${SERVICE_FILES})
+
+target_include_directories(mse2cdb PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${SQLITE3_INCLUDE_DIRS}
+        ${LUA53_INCLUDE_DIR}
+        ${LIBZIP_INCLUDE_DIR})
+
+target_link_libraries(mse2cdb PRIVATE
+        ${SQLITE3_LIBRARIES}
+        ${LUA53_LIBRARIES}
+        ${LIBZIP_LIBRARIES}
+        ZLIB::ZLIB
+        Threads::Threads
+        -static)
+
+# GCC 7/8 require a separate library for std::filesystem.
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9)
+    target_link_libraries(mse2cdb PRIVATE stdc++fs)
+endif()
+
+add_custom_command(TARGET mse2cdb POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/lua ${CMAKE_CURRENT_BINARY_DIR}/lua)
-
-add_executable(mse2cdb ${MAIN_FILES} ${IO_FILES} ${DOMAIN_FILES} ${SERVICE_FILES} ${CMAKE_CURRENT_BINARY_DIR}/lua)
-target_link_libraries(mse2cdb ${SQLITE3_LIBRARIES} ${LUA53_LIBRARIES} ${LIBZIP_LIBRARIES} ${PTHREAD_LIBRARIES} ${DL_LIBRARIES} ${Z_LIBRARIES} -static)
-
-## Windows Build
-#target_link_libraries(mse2cdb ${WIN_STD_LIBRARIES} ${WIN_SQLITE3_LIBRARIES} ${WIN_LUA53_LIBRARIES} ${WIN_LIBZIP_LIBRARIES} ${WIN_PTHREAD_LIBRARIES} ${WIN_Z_LIBRARIES} -static)
+                ${CMAKE_CURRENT_SOURCE_DIR}/lua $<TARGET_FILE_DIR:mse2cdb>/lua
+        COMMENT "Copying Lua scripts next to the executable")

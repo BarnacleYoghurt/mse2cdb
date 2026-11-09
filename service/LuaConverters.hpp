@@ -9,9 +9,9 @@
 #include <string>
 #include <vector>
 
-#include "lua5.3/lua.h"
-#include "lua5.3/lauxlib.h"
-#include "lua5.3/lualib.h"
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
 
 
 std::string lua_conv_toStdString(lua_State *L, int i);
