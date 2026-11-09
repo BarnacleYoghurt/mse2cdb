@@ -3,6 +3,7 @@
 #include <fstream>
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
+#include <filesystem>
 #include "io/CDBAccess.hpp"
 #include "domain/MSEDataNode.hpp"
 
@@ -14,15 +15,21 @@
 #include <sstream>
 #include <io/MSEReader.hpp>
 #include <service/LuaCardData.hpp>
-//For cross-platform chdir
-#include <unistd.h>
 
 int main(int argc, char **argv) {
     const char *usage = "Usage: mse2cdb [-l language] [-t template] msePath cdbPath";
-    if (argc > 0){
-        std::string exePath(argv[0]);
-        exePath = exePath.substr(0, exePath.find_last_of("\\"));
-        chdir(exePath.c_str());
+    if (argc > 0) {
+        //move to the directory that holds the executable and therefore the scripts
+        std::filesystem::path exeDir = std::filesystem::path(argv[0]).parent_path();
+        if (!exeDir.empty()) {
+            std::error_code ec;
+            std::filesystem::current_path(exeDir, ec);
+            if (ec) {
+                std::cerr << "Could not enter mse2cdb directory ("
+                          << ec.message() << ")" << std::endl;
+                return EXIT_FAILURE;
+            }
+        }
     }
 
     int opt = 0;
