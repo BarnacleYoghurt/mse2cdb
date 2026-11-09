@@ -4,6 +4,7 @@
 #include <map>
 #include <memory>
 #include <vector>
+#include <string>
 
 namespace domain {
     class MSEDataNode {

@@ -2,7 +2,6 @@
 #include <getopt.h>
 #include <fstream>
 #include <algorithm>
-#include <boost/algorithm/string.hpp>
 #include <filesystem>
 #include "io/CDBAccess.hpp"
 #include "domain/MSEDataNode.hpp"
@@ -15,6 +14,16 @@
 #include <sstream>
 #include <io/MSEReader.hpp>
 #include <service/LuaCardData.hpp>
+
+//Replace all occurrences of search with replace in str.
+static void replaceAll(std::string &str, const std::string &search, const std::string &replace) {
+    size_t pos = 0;
+    while ((pos = str.find(search, pos)) != std::string::npos) {
+        str.replace(pos, search.length(), replace);
+        pos += replace.length();
+    }
+}
+
 
 int main(int argc, char **argv) {
     const char *usage = "Usage: mse2cdb [-l language] [-t template] msePath cdbPath";
@@ -82,7 +91,7 @@ int main(int argc, char **argv) {
         std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;
     }
-    boost::replace_all(setData, "\r\n", "\n");
+    replaceAll(setData, "\r\n", "\n");
     domain::MSEDataNode root(setData);
     std::cout << "Success!" << std::endl;
 
