@@ -13,7 +13,11 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}")
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
+option(MSE2CDB_STATIC "Link statically to produce a self-contained portable application" ON)
+
+if(MSE2CDB_STATIC)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
+endif()
 find_package(sqlite3 REQUIRED)
 find_package(Lua53 REQUIRED)
 find_package(LibZip REQUIRED)
@@ -38,12 +42,17 @@ target_link_libraries(mse2cdb PRIVATE
         ${LUA53_LIBRARIES}
         ${LIBZIP_LIBRARIES}
         ZLIB::ZLIB
-        Threads::Threads
-        -static)
+        Threads::Threads)
 
 # GCC 7/8 require a separate library for std::filesystem.
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9)
     target_link_libraries(mse2cdb PRIVATE stdc++fs)
+endif()
+
+if(MSE2CDB_STATIC)
+    target_link_options(mse2cdb PRIVATE -static)
+elseif(WIN32)
+    message(WARNING "MSE2CDB_STATIC is OFF: the Windows executable will require DLLs at runtime.")
 endif()
 
 add_custom_command(TARGET mse2cdb POST_BUILD
