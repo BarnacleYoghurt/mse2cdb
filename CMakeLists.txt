@@ -1,7 +1,16 @@
-cmake_minimum_required(VERSION 3.7)
-project(mse2cdb)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}")
+cmake_minimum_required(VERSION 3.16)
+project(mse2cdb VERSION 0.1.0 LANGUAGES C CXX)
+
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Default to Release for single-configuration generators when no build type is given.
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Debug Release RelWithDebInfo MinSizeRel)
+endif()
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}")
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 ## Windows Build
