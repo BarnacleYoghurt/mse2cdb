@@ -9,10 +9,7 @@
 #include <string>
 #include <vector>
 
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
-
+#include "lua_include.hpp"
 
 std::string lua_conv_toStdString(lua_State *L, int i);
 lua_Integer lua_conv_tointeger(lua_State *L, int i);

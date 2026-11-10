@@ -3,9 +3,7 @@
 
 #include <domain/MSEDataNode.hpp>
 
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
+#include "lua_include.hpp"
 
 namespace service {
     namespace mseNodeData {

@@ -6,10 +6,6 @@
 #include "io/CDBAccess.hpp"
 #include "domain/MSEDataNode.hpp"
 
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
-
 #include <zip.h>
 #include <sstream>
 #include <io/MSEReader.hpp>
