@@ -1,16 +1,12 @@
 #ifndef MSE2CDB_LUARUNNER_HPP
 #define MSE2CDB_LUARUNNER_HPP
 
-
 #include <string>
 #include <domain/MSEDataNode.hpp>
 #include <vector>
 
-#include "lua5.3/lua.h"
-#include "lua5.3/lauxlib.h"
-#include "lua5.3/lualib.h"
+#include "lua_include.hpp"
 #include "LuaMSENodeData.hpp"
-
 
 namespace service {
     class LuaCardData {

@@ -78,6 +78,10 @@ fabric.properties
 *.out
 *.app
 
-#Test Data
+# Test Data
 *.cdb
 *.mse
+*.mse-set
+
+# Build directory as per README
+build/

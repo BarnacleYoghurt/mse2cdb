@@ -1,40 +1,93 @@
-cmake_minimum_required(VERSION 3.7)
-project(mse2cdb)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}")
+cmake_minimum_required(VERSION 3.16)
+project(mse2cdb VERSION 0.1.0 LANGUAGES C CXX)
+
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Default to Release for single-configuration generators when no build type is given.
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Debug Release RelWithDebInfo MinSizeRel)
+endif()
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}")
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-## Windows Build
-#set(CMAKE_CXX_COMPILER /usr/bin/x86_64-w64-mingw32-gcc)
-#set(WIN_SQLITE3_LIBRARIES /usr/lib/gcc/x86_64-w64-mingw32/5.3-win32/include/c++/x86_64-w64-mingw32/sqlite3.dll)
-#set(WIN_LUA53_LIBRARIES /usr/lib/gcc/x86_64-w64-mingw32/5.3-win32/include/c++/x86_64-w64-mingw32/lua5.3/liblua53.a)
-#set(WIN_LIBZIP_LIBRARIES /usr/lib/gcc/x86_64-w64-mingw32/5.3-win32/include/c++/x86_64-w64-mingw32/libzip.dll)
-#set(WIN_PTHREAD_LIBRARIES /usr/lib/gcc/x86_64-w64-mingw32/5.3-win32/include/c++/x86_64-w64-mingw32/libpthread.dll.a)
-#set(WIN_DL_LIBRARIES /usr/lib/gcc/x86_64-w64-mingw32/5.3-win32/include/c++/x86_64-w64-mingw32/lua5.3/liblua53.a)
-#set(WIN_Z_LIBRARIES /usr/lib/gcc/x86_64-w64-mingw32/5.3-win32/include/c++/x86_64-w64-mingw32/libz.dll.a)
-#set(WIN_STD_LIBRARIES /usr/lib/gcc/x86_64-w64-mingw32/5.3-win32/libstdc++.a)
+option(MSE2CDB_STATIC "Link statically to produce a self-contained portable application" ON)
 
-find_package(sqlite3 REQUIRED)
-find_package(Lua53 REQUIRED)
+if(MSE2CDB_STATIC)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
+endif()
+find_package(SQLite3 REQUIRED)
+find_package(Lua 5.3 REQUIRED)
 find_package(LibZip REQUIRED)
-find_library(PTHREAD_LIBRARIES NAMES libpthread.a pthread)
-find_library(DL_LIBRARIES NAMES libdl.a dl)
-find_library(Z_LIBRARIES NAMES libz.a z)
+find_package(ZLIB REQUIRED)
+find_package(Threads REQUIRED)
 
-include_directories(./)
+# Static libzip may have been built with additional backend dependencies, in which case we need to supply those too.
+# For a dynamic build, these references are, well, dynamic.
+set(LIBZIP_BACKENDS)
+if (MSE2CDB_STATIC)
+    macro(try_find_libzip_backend name target)
+        find_package(${name} QUIET)
+        if (TARGET ${target})
+            list(APPEND LIBZIP_BACKENDS ${target})
+        else()
+            message(WARNING "Could not find ${name}; build may fail if your libzip.a requires it.")
+        endif()
+    endmacro()
+
+    try_find_libzip_backend(BZip2 BZip2::BZip2)
+    try_find_libzip_backend(LibLZMA LibLZMA::LibLZMA)
+    try_find_libzip_backend(Zstd zstd::libzstd_static)
+    if (WIN32) # native Windows bcrypt
+        list(APPEND LIBZIP_BACKENDS bcrypt)
+    endif()
+endif()
+
+if(NOT TARGET SQLite3::SQLite3) # CMake < 4.3
+    add_library(SQLite3::SQLite3 ALIAS SQLite::SQLite3)
+endif()
+
+# FindLua does not (yet?) provide an imported target
+if(Lua_FOUND AND NOT TARGET Lua::Lua)
+    add_library(Lua::Lua INTERFACE IMPORTED)
+    set_target_properties(Lua::Lua PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${LUA_INCLUDE_DIR}"
+        INTERFACE_LINK_LIBRARIES "${LUA_LIBRARIES}"
+    )
+endif()
 
 set(MAIN_FILES main.cpp)
 set(IO_FILES io/CDBAccess.cpp io/CDBAccess.hpp io/MSEReader.cpp io/MSEReader.hpp io/LuaScriptFinder.cpp io/LuaScriptFinder.hpp)
 set(DOMAIN_FILES domain/MSEDataNode.cpp domain/MSEDataNode.hpp domain/CDBCard.hpp)
 set(SERVICE_FILES service/LuaCardData.cpp service/LuaCardData.hpp service/LuaMSENodeData.cpp service/LuaMSENodeData.hpp service/LuaConverters.hpp service/LuaConverters.cpp)
 
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/lua
-        DEPENDS ${CMAKE_SOURCE_DIR}/lua
+add_executable(mse2cdb ${MAIN_FILES} ${IO_FILES} ${DOMAIN_FILES} ${SERVICE_FILES})
+
+target_include_directories(mse2cdb PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_link_libraries(mse2cdb PRIVATE
+        SQLite3::SQLite3
+        Lua::Lua
+        LibZip::LibZip
+        ${LIBZIP_BACKENDS}
+        ZLIB::ZLIB
+        Threads::Threads)
+
+# GCC 7/8 require a separate library for std::filesystem.
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9)
+    target_link_libraries(mse2cdb PRIVATE stdc++fs)
+endif()
+
+if(MSE2CDB_STATIC)
+    target_link_options(mse2cdb PRIVATE -static)
+elseif(WIN32)
+    message(WARNING "MSE2CDB_STATIC is OFF: the Windows executable will require DLLs at runtime.")
+endif()
+
+add_custom_command(TARGET mse2cdb POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/lua ${CMAKE_CURRENT_BINARY_DIR}/lua)
-
-add_executable(mse2cdb ${MAIN_FILES} ${IO_FILES} ${DOMAIN_FILES} ${SERVICE_FILES} ${CMAKE_CURRENT_BINARY_DIR}/lua)
-target_link_libraries(mse2cdb ${SQLITE3_LIBRARIES} ${LUA53_LIBRARIES} ${LIBZIP_LIBRARIES} ${PTHREAD_LIBRARIES} ${DL_LIBRARIES} ${Z_LIBRARIES} -static)
-
-## Windows Build
-#target_link_libraries(mse2cdb ${WIN_STD_LIBRARIES} ${WIN_SQLITE3_LIBRARIES} ${WIN_LUA53_LIBRARIES} ${WIN_LIBZIP_LIBRARIES} ${WIN_PTHREAD_LIBRARIES} ${WIN_Z_LIBRARIES} -static)
+                ${CMAKE_CURRENT_SOURCE_DIR}/lua $<TARGET_FILE_DIR:mse2cdb>/lua
+        COMMENT "Copying Lua scripts next to the executable")

@@ -1,6 +1,6 @@
 #include "MSEDataNode.hpp"
-#include <boost/algorithm/string.hpp>
 #include <sstream>
+#include <algorithm>
 
 namespace domain {
     MSEDataNode::MSEDataNode(std::string sourceText) : sourceText(sourceText) {
