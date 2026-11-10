@@ -24,6 +24,27 @@ find_package(LibZip REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(Threads REQUIRED)
 
+# Static libzip may have been built with additional backend dependencies, in which case we need to supply those too.
+# For a dynamic build, these references are, well, dynamic.
+set(LIBZIP_BACKENDS)
+if (MSE2CDB_STATIC)
+    macro(try_find_libzip_backend name target)
+        find_package(${name} QUIET)
+        if (TARGET ${target})
+            list(APPEND LIBZIP_BACKENDS ${target})
+        else()
+            message(WARNING "Could not find ${name}; build may fail if your libzip.a requires it.")
+        endif()
+    endmacro()
+
+    try_find_libzip_backend(BZip2 BZip2::BZip2)
+    try_find_libzip_backend(LibLZMA LibLZMA::LibLZMA)
+    try_find_libzip_backend(Zstd zstd::libzstd_static)
+    if (WIN32) # native Windows bcrypt
+        list(APPEND LIBZIP_BACKENDS bcrypt)
+    endif()
+endif()
+
 if(NOT TARGET SQLite3::SQLite3) # CMake < 4.3
     add_library(SQLite3::SQLite3 ALIAS SQLite::SQLite3)
 endif()
@@ -51,6 +72,7 @@ target_link_libraries(mse2cdb PRIVATE
         SQLite3::SQLite3
         Lua::Lua
         LibZip::LibZip
+        ${LIBZIP_BACKENDS}
         ZLIB::ZLIB
         Threads::Threads)
 

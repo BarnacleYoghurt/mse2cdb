@@ -2,7 +2,7 @@
 #
 # The expected include convention is
 #   #include <zip.h>
-# i.e. LibZip_INCLUDE_DIR is the directory that directly contains zip.h.
+# i.e. LibZip_INCLUDE_DIRS is the directory that directly contains zip.h.
 #
 # Result variables:
 #   LibZip_FOUND         - True if libzip was found.
@@ -38,6 +38,11 @@ if(LibZip_FOUND)
     set_target_properties(LibZip::LibZip PROPERTIES
         IMPORTED_LOCATION "${LibZip_LIBRARIES}"
         INTERFACE_INCLUDE_DIRECTORIES "${LibZip_INCLUDE_DIRS}")
+    if (WIN32 AND NOT LibZip_LIBRARIES MATCHES "\.dll\.a$")
+        # When using a static Windows library, you need to define ZIP_STATIC
+        # when compiling packages using libzip.
+        target_compile_definitions(LibZip::LibZip INTERFACE ZIP_STATIC)
+    endif()
 endif()
 
-mark_as_advanced(LibZip_INCLUDE_DIR LibZip_LIBRARY)
+mark_as_advanced(LibZip_INCLUDE_DIRS LibZip_LIBRARIES)
